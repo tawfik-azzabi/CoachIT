@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiches Formation DSI — INWI</title>
+<style>
+:root {
+  --bg:#0f1623;--surface:#1a2235;--surface2:#1e2a3a;--border:#2a3a50;
+  --text:#e8edf5;--muted:#7a8ba0;--green:#22c55e;--orange:#f59e0b;
+  --red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--teal:#14b8a6;
+  --blue-bg:rgba(59,130,246,.09);--blue-b:rgba(59,130,246,.3);
+  --green-bg:rgba(34,197,94,.09);--green-b:rgba(34,197,94,.3);
+  --orange-bg:rgba(245,158,11,.09);--orange-b:rgba(245,158,11,.3);
+  --red-bg:rgba(239,68,68,.09);--red-b:rgba(239,68,68,.3);
+  --purple-bg:rgba(168,85,247,.09);--purple-b:rgba(168,85,247,.3);
+  --teal-bg:rgba(20,184,166,.09);--teal-b:rgba(20,184,166,.3);
+  --r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:13.5px;line-height:1.6;display:flex;min-height:100vh}
+
+/* SIDEBAR */
+#sidebar{width:260px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+#sidebar header{padding:20px 18px 14px;border-bottom:1px solid var(--border)}
+#sidebar header h1{font-size:13px;font-weight:700;color:var(--text)}
+#sidebar header p{font-size:11px;color:var(--muted);margin-top:3px}
+.mod-group{padding:10px 0}
+.mod-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:6px 18px 4px;display:flex;align-items:center;gap:8px}
+.mod-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mod-item{display:flex;align-items:center;gap:9px;padding:7px 18px;font-size:12px;color:var(--muted);cursor:pointer;transition:.15s;border-left:2px solid transparent;text-decoration:none}
+.mod-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.mod-item.active{color:var(--blue);border-left-color:var(--blue);background:var(--blue-bg)}
+.mod-item .num{font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(255,255,255,.07)}
+.progress-bar{height:2px;background:rgba(255,255,255,.07);margin:0 18px 6px;border-radius:2px}
+.progress-fill{height:100%;border-radius:2px;transition:.3s}
+#sidebar footer{padding:14px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);margin-top:auto}
+
+/* MAIN */
+#main{flex:1;overflow-y:auto;padding:32px 36px;max-width:860px}
+.module-header{margin-bottom:28px}
+.module-header .tag{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 10px;border-radius:4px;display:inline-block;margin-bottom:10px}
+.module-header h2{font-size:22px;font-weight:700;margin-bottom:6px}
+.module-header p{font-size:13px;color:var(--muted);max-width:620px}
+
+/* MODULE hidden */
+.module{display:none}
+.module.active{display:block}
+
+/* FICHE */
+.fiche{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:20px;overflow:hidden}
+.fiche-header{padding:16px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer;user-select:none}
+.fiche-header h3{font-size:14px;font-weight:600}
+.fiche-header .meta{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.fiche-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:3px}
+.read-time{font-size:10px;color:var(--muted)}
+.fiche-body{padding:20px;display:none}
+.fiche.open .fiche-body{display:block}
+.chevron{font-size:11px;color:var(--muted);transition:.2s;flex-shrink:0;margin-top:3px}
+.fiche.open .chevron{transform:rotate(180deg)}
+
+/* CONTENT BLOCKS */
+.essentiel{background:var(--blue-bg);border:1px solid var(--blue-b);border-radius:6px;padding:12px 14px;margin-bottom:16px;font-size:13px;line-height:1.6}
+.essentiel strong{color:var(--blue);font-size:10px;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
+
+.section-title{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
+
+.inwi-box{background:var(--surface2);border-left:3px solid var(--orange);border-radius:0 6px 6px 0;padding:11px 14px;margin-bottom:14px;font-size:12.5px}
+.inwi-box strong{color:var(--orange);font-size:10px;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+
+.signals{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.signal{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;line-height:1.5}
+.sig{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;flex-shrink:0;margin-top:1px}
+.sig.q{background:var(--blue-bg);border:1px solid var(--blue-b);color:var(--blue)}
+.sig.w{background:var(--orange-bg);border:1px solid var(--orange-b);color:var(--orange)}
+.sig.ok{background:var(--green-bg);border:1px solid var(--green-b);color:var(--green)}
+.sig.kO{background:var(--red-bg);border:1px solid var(--red-b);color:var(--red)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{font-size:10.5px;padding:3px 9px;border-radius:4px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,.03)}
+.chip.b{border-color:var(--blue-b);color:var(--blue);background:var(--blue-bg)}
+.chip.g{border-color:var(--green-b);color:var(--green);background:var(--green-bg)}
+.chip.o{border-color:var(--orange-b);color:var(--orange);background:var(--orange-bg)}
+.chip.r{border-color:var(--red-b);color:var(--red);background:var(--red-bg)}
+
+.schema{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:11.5px;font-family:'Courier New',monospace;line-height:1.8;margin-bottom:14px;color:var(--muted);overflow-x:auto}
+.schema .hl{color:var(--blue)}
+.schema .hl2{color:var(--orange)}
+.schema .hl3{color:var(--green)}
+
+.alert-box{background:var(--red-bg);border:1px solid var(--red-b);border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:14px}
+.alert-box strong{color:var(--red);font-size:10px;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+
+p{color:var(--muted);font-size:13px;margin-bottom:10px;line-height:1.6}
+p:last-child{margin-bottom:0}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <header>
+    <h1>Formation DSI — INWI</h1>
+    <p>Fiches de lecture pratiques · 2026</p>
+  </header>
+
+  <div class="mod-group">
+    <div class="mod-label"><span class="mod-dot" style="background:#3b82f6"></span>BSS / OSS</div>
+    <a class="mod-item active" onclick="show('m1')" href="#">
+      <span class="num">1</span>BSS / OSS &amp; frontières réseau
+    </a>
+    <div class="progress-bar"><div class="progress-fill" style="background:#3b82f6;width:0%" id="p1"></div></div>
+  </div>
+
+  <div class="mod-group">
+    <div class="mod-label"><span class="mod-dot" style="background:#22c55e"></span>Delivery &amp; Projets</div>
+    <a class="mod-item" onclick="show('m2')" href="#">
+      <span class="num">2</span>Delivery &amp; Projets IT
+    </a>
+    <div class="progress-bar"><div class="progress-fill" style="background:#22c55e;width:0%" id="p2"></div></div>
+  </div>
+
+  <div class="mod-group">
+    <div class="mod-label"><span class="mod-dot" style="background:#a855f7"></span>Architecture</div>
+    <a class="mod-item" onclick="show('m3')" href="#">
+      <span class="num">3</span>Architecture IT &amp; Urbanisme
+    </a>
+    <div class="progress-bar"><div class="progress-fill" style="background:#a855f7;width:0%" id="p3"></div></div>
+  </div>
+
+  <div class="mod-group">
+    <div class="mod-label"><span class="mod-dot" style="background:#f59e0b"></span>Support &amp; Exploitation</div>
+    <a class="mod-item" onclick="show('m4')" href="#">
+      <span class="num">4</span>Support, Supervision &amp; Exploitation
+    </a>
+    <div class="progress-bar"><div class="progress-fill" style="background:#f59e0b;width:0%" id="p4"></div></div>
+  </div>
+
+  <div class="mod-group">
+    <div class="mod-label"><span class="mod-dot" style="background:#14b8a6"></span>Réseau Télécom</div>
+    <a class="mod-item" onclick="show('m5')" href="#">
+      <span class="num">5</span>Réseau Télécom — bases DSI
+    </a>
+    <div class="progress-bar"><div class="progress-fill" style="background:#14b8a6;width:0%" id="p5"></div></div>
+  </div>
+
+  <div class="mod-group">
+    <div class="mod-label"><span class="mod-dot" style="background:#ef4444"></span>Pilotage &amp; Gouvernance</div>
+    <a class="mod-item" onclick="show('m6')" href="#">
+      <span class="num">6</span>Pilotage &amp; Gouvernance SI
+    </a>
+    <div class="progress-bar"><div class="progress-fill" style="background:#ef4444;width:0%" id="p6"></div></div>
+  </div>
+
+  <footer>INWI · DSI · Tawfik Azzabi · 2026<br>Module Infrastructure à venir</footer>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+<!-- ===================== MODULE 1 : BSS/OSS ===================== -->
+<div id="m1" class="module active">
+  <div class="module-header">
+    <span class="tag" style="background:var(--blue-bg);border:1px solid var(--blue-b);color:var(--blue)">Module 1</span>
+    <h2>BSS / OSS &amp; frontières SI–Réseau</h2>
+    <p>Comprendre la colonne vertébrale du SI d'un opérateur télécom — et savoir exactement où s'arrête le SI et où commence le réseau.</p>
+  </div>
+
+  <!-- Fiche 1.1 -->
+  <div class="fiche open">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>1.1 — BSS et OSS : les deux familles du SI télécom</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-b)">Fondamental</span><span class="read-time">⏱ 7 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Le SI d'un opérateur se divise en deux grandes familles : le BSS gère la relation client et l'argent (facturation, CRM, offres) ; l'OSS gère le réseau et les opérations techniques (activation, supervision, incidents). Les deux sont interdépendants mais ont des logiques différentes.</div>
+
+      <div class="section-title">BSS — Business Support Systems</div>
+      <p>Le BSS couvre tout ce qui est tourné vers le client et le business : la gestion des offres, les commandes, la facturation, le recouvrement et la relation client. C'est le "front-office" du SI. Un client souscrit une offre → le BSS l'enregistre, génère la facture, encaisse le paiement.</p>
+      <div class="inwi-box"><strong>Chez INWI</strong>BSS = <b>Salesforce</b> (CRM, commandes, relation client B2C et B2B) + <b>Codix IMX</b> (nouvelle facturation, remplace BSCS via projet PHENIX) + <b>Nokia Mediation</b> (collecte des usages réseau) + <b>CSG International</b> (interconnexion opérateurs) + <b>BASSET</b> (roaming international) + <b>PAYX / HPS PowerCard</b> (encaissement et paiement).</div>
+
+      <div class="section-title">OSS — Operations Support Systems</div>
+      <p>L'OSS couvre la gestion opérationnelle du réseau et du SI : activation des services, supervision des équipements, gestion des incidents et des changements. C'est le "back-office technique". Un client achète un forfait → l'OSS active techniquement le service sur le réseau.</p>
+      <div class="inwi-box"><strong>Chez INWI</strong>OSS = <b>ServiceNow</b> (ITSM : incidents, problèmes, changements, CMDB) + <b>Nokia Provisioning</b> (activation services réseau) + <b>Centreon</b> (supervision infrastructure) + <b>Dynatrace</b> (monitoring applicatif/APM) + <b>SPN</b> (portabilité des numéros).</div>
+
+      <div class="section-title">Le lien entre les deux</div>
+      <div class="schema">
+[CLIENT] → commande offre<br>
+    ↓<br>
+<span class="hl">BSS</span> : Salesforce crée le compte → Codix génère le contrat<br>
+    ↓ (order d'activation via ESB/APIGEE)<br>
+<span class="hl2">OSS</span> : Nokia Provisioning active le service sur le réseau<br>
+    ↓ (CDRs = tickets d'usage remontent via Nokia Médiation)<br>
+<span class="hl">BSS</span> : Codix valorise les usages → génère la facture → PAYX encaisse
+      </div>
+
+      <div class="section-title">Questions intelligentes à poser à vos N-1</div>
+      <div class="signals">
+        <div class="signal"><span class="sig q">?</span>Quelle est la latence entre la souscription en boutique et l'activation effective sur le réseau ? Qui la monitore ?</div>
+        <div class="signal"><span class="sig q">?</span>Les CDRs remontés par Nokia Médiation sont-ils réconciliés avec la facturation Codix ? À quelle fréquence et avec quel taux d'anomalie ?</div>
+        <div class="signal"><span class="sig q">?</span>Quels systèmes BSS sont en mode "maintenance seule" (fin de vie) et quels sont les risques associés ? (BSCS en est un exemple)</div>
+      </div>
+
+      <div class="section-title">Vocabulaire clé</div>
+      <div class="chips">
+        <span class="chip b">CDR</span><span class="chip b">Médiation</span><span class="chip b">Charging</span><span class="chip b">Provisioning</span><span class="chip b">Order Management</span><span class="chip b">Rating/Billing</span><span class="chip b">Roaming</span><span class="chip b">Interconnexion</span><span class="chip b">CMDB</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fiche 1.2 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>1.2 — La frontière SI / Réseau chez INWI</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-b)">Fondamental</span><span class="read-time">⏱ 6 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>La DSI gère le SI applicatif (BSS/OSS, applications métier, infrastructure IT). La Direction Réseau gère les équipements radio et cœur de réseau. La frontière passe par deux points précis : la <b>médiation</b> (remontée des CDRs réseau vers le SI) et le <b>provisioning</b> (ordres d'activation du SI vers le réseau). Ces deux points sont critiques et souvent sources de friction.</div>
+
+      <div class="section-title">Cartographie de la frontière</div>
+      <div class="schema">
+<span class="hl">— PÉRIMÈTRE DSI (SI) ——————————</span>  | <span class="hl2">— RÉSEAU ——</span><br>
+Applications · Serveurs · BDD · SAN   |  BTS · RNC · MSC<br>
+BSS (Salesforce, Codix, SAP...)        |  Core 4G/5G (EPC)<br>
+OSS (ServiceNow, Centreon...)          |  IP/MPLS Transport<br>
+                                       |<br>
+<span class="hl3">POINTS DE JONCTION :</span><br>
+Nokia <b>Médiation</b>  → CDRs réseau → SI Billing<br>
+Nokia <b>Provisioning</b> → SI → activation services réseau<br>
+<b>SPN</b> (portabilité) → interfacé Réseau+SI
+      </div>
+
+      <div class="inwi-box"><strong>Ce que ça implique pour vous</strong>Quand un incident impacte un service client, la première question est : <b>"C'est réseau ou SI ?"</b> L'outage d'inwi Money peut venir du SI (Comviva/applicatif) ou du réseau (USSD, infrastructure data). Sans clarté sur la frontière, les équipes se renvoient la responsabilité. C'est exactement la situation PCA/PRA non tranchée entre OPS et INFRA.</div>
+
+      <div class="section-title">Signaux d'alerte à surveiller</div>
+      <div class="signals">
+        <div class="signal"><span class="sig kO">✗</span>Incidents sans ownership clair ("c'est le réseau" vs "c'est le SI") — signe que la frontière n'est pas documentée et contractualisée en interne.</div>
+        <div class="signal"><span class="sig w">!</span>Anomalies de CDRs (usages réseau non facturés ou sur-facturés) — la médiation est un point fragile. Des CDRs perdus = du chiffre d'affaires non facturé.</div>
+        <div class="signal"><span class="sig w">!</span>Délais d'activation anormaux — si le provisioning dysfonctionne, les clients attendent leur service. Impact direct NPS.</div>
+      </div>
+
+      <div class="section-title">Questions à poser à S&E et Architecture</div>
+      <div class="signals">
+        <div class="signal"><span class="sig q">?</span>Existe-t-il un document de frontière SI/Réseau formalisé, avec ownership par système ?</div>
+        <div class="signal"><span class="sig q">?</span>Les SLA entre la DSI et la Direction Réseau sont-ils formalisés (OLA) ? Qui les pilote ?</div>
+      </div>
+
+      <div class="chips"><span class="chip b">OLA</span><span class="chip b">CDR perdu</span><span class="chip b">Taux de médiation</span><span class="chip b">Délai provisioning</span><span class="chip b">USSD</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 1.3 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>1.3 — Le cycle de vie d'un client télécom (de bout en bout)</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)">Pratique</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Chaque acte client (souscription, changement d'offre, réclamation, résiliation) traverse 4 à 7 systèmes différents. Comprendre ce parcours vous permet de diagnostiquer où un processus dysfonctionne et d'arbitrer les priorités projet.</div>
+
+      <div class="schema">
+<span class="hl">1. ACQUISITION</span>  Boutique/Digital → <b>Salesforce Sales Cloud</b><br>
+      ↓ Création compte, vérification identité, choix offre<br><br>
+<span class="hl">2. ACTIVATION</span>  Salesforce → ESB → <b>Nokia Provisioning</b> → Réseau<br>
+      ↓ Activation SIM, attribution numéro (SPN si portabilité)<br><br>
+<span class="hl">3. USAGE</span>  Client utilise (voix/data/SMS)<br>
+      ↓ Réseau génère CDRs → <b>Nokia Médiation</b> → <b>Codix IMX</b><br><br>
+<span class="hl">4. FACTURATION</span>  <b>Codix IMX</b> rate les CDRs, génère la facture<br>
+      ↓ Envoi facture (email/courrier) — Paiement via <b>PAYX / HPS</b><br><br>
+<span class="hl">5. SERVICE CLIENT</span>  Réclamation → <b>Salesforce Service Cloud</b><br>
+      ↓ Incident → <b>ServiceNow</b> si technique<br><br>
+<span class="hl">6. RÉTENTION / RÉSILIATION</span>  <b>Salesforce + evolvingLM</b> (fidélisation)
+      </div>
+
+      <div class="inwi-box"><strong>Chez INWI — ce qui change avec PHENIX</strong>BSCS (ancien système de rating/billing) est remplacé par Codix IMX. Pendant la migration, les deux systèmes coexistent. Le risque : des CDRs mal migrés = des factures fausses. C'est pourquoi la "Credit Set" (correction de facturation) est un sujet critique dans le projet PHENIX.</div>
+    </div>
+  </div>
+
+  <!-- Fiche 1.4 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>1.4 — inwi Money : SI d'une fintech dans un opérateur</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)">INWI-Spécifique</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>inwi Money est un service de mobile money (paiement mobile, transfert d'argent) adossé à la licence télécom d'inwi. Il repose sur la plateforme <b>Comviva Mobiquity</b> et s'interface avec le réseau (USSD) et le SI bancaire (BAM). C'est un SI autonome avec ses propres exigences de disponibilité et ses propres risques.</div>
+
+      <div class="inwi-box"><strong>La situation actuelle</strong>Le contrat d'upgrade de la plateforme Comviva (Mobiquity X-Pay 10Gen) est en impasse : contrats non finalisés (dates effectives vierges, signatures Comviva manquantes), et le commissioning date du 01/03/2026 est dépassé. C'est un risque juridique ET un risque de continuité de service sur inwi Money.</div>
+
+      <div class="section-title">Points de vigilance spécifiques inwi Money</div>
+      <div class="signals">
+        <div class="signal"><span class="sig kO">✗</span>La plateforme actuelle Comviva est en fin de vie — sans upgrade, risque de dépréciation technique et de non-conformité réglementaire BAM.</div>
+        <div class="signal"><span class="sig w">!</span>inwi Money est sur le réseau USSD (technologie vieillissante). La migration vers API/app est un enjeu d'architecture.</div>
+        <div class="signal"><span class="sig q">?</span>Quel est le SLA de disponibilité contractualisé avec inwi Money (filiale ?) et qui en est responsable côté DSI ?</div>
+      </div>
+
+      <div class="chips"><span class="chip o">Comviva</span><span class="chip o">USSD</span><span class="chip o">Mobile Money</span><span class="chip o">BAM</span><span class="chip o">Mobiquity</span><span class="chip o">KYC</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 2 : DELIVERY ===================== -->
+<div id="m2" class="module">
+  <div class="module-header">
+    <span class="tag" style="background:var(--green-bg);border:1px solid var(--green-b);color:var(--green)">Module 2</span>
+    <h2>Delivery &amp; Projets IT</h2>
+    <p>Lire un reporting projet, comprendre les méthodes de delivery et piloter votre direction E&D avec les bons réflexes.</p>
+  </div>
+
+  <!-- Fiche 2.1 -->
+  <div class="fiche open">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>2.1 — Comment lire un reporting projet (RAG et jalons)</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)">Fondamental</span><span class="read-time">⏱ 6 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Le reporting projet vous dit où en est le projet (avancement), si c'est en bonne voie (RAG status), ce qui bloque (risques et points d'attention) et ce qui est attendu de vous (décisions). Ne lisez pas un reporting ligne par ligne — lisez-le en 3 temps : RAG global → jalons critiques → décisions requises.</div>
+
+      <div class="section-title">Le RAG status — ce qu'il signifie vraiment</div>
+      <div class="signals">
+        <div class="signal"><span class="sig ok">●</span><b>VERT :</b> En ligne avec le plan. Attention — un projet peut être vert et cacher des risques non déclarés (pression sur les équipes, dette technique).</div>
+        <div class="signal"><span class="sig w">●</span><b>ORANGE :</b> Des dérives sont identifiées mais sous contrôle. C'est là que vous devez challenger : "Sous contrôle comment ? Qui porte le plan de rattrapage ?"</div>
+        <div class="signal"><span class="sig kO">●</span><b>ROUGE :</b> Dérive significative ou blocage. Un projet rouge sans plan d'action documenté est un signal de management, pas juste de technique.</div>
+      </div>
+
+      <div class="inwi-box"><strong>Chez INWI — E&D Reporting (lecture des documents)</strong>
+        Le reporting E&D présente le portefeuille par axe (BSS, CRM, Corporate...) avec un RAG par projet et par dimension (planning, budget, qualité). Le "respect planning" global est à 71% — ce qui veut dire que 3 projets sur 10 dérivent. La question n'est pas "pourquoi ça dérive" mais "est-ce qu'on a un plan de priorisation ?"
+      </div>
+
+      <div class="section-title">Les 5 questions à poser en revue de projet</div>
+      <div class="signals">
+        <div class="signal"><span class="sig q">?</span>Quel est le jalon critique suivant et sa date ? Qui en est owner ?</div>
+        <div class="signal"><span class="sig q">?</span>Quels sont les 2-3 risques qui pourraient le faire passer rouge ?</div>
+        <div class="signal"><span class="sig q">?</span>Y a-t-il une décision qui dépend de moi (arbitrage, déblocage, escalade) ?</div>
+        <div class="signal"><span class="sig q">?</span>Le budget consommé est-il cohérent avec l'avancement réel ?</div>
+        <div class="signal"><span class="sig q">?</span>L'équipe est-elle en surcharge ? Des ressources clés sont-elles à risque de départ ?</div>
+      </div>
+
+      <div class="chips"><span class="chip g">RAG</span><span class="chip g">Jalon</span><span class="chip g">Dérive</span><span class="chip g">Plan de rattrapage</span><span class="chip g">Go/No-Go</span><span class="chip g">Burn rate</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 2.2 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>2.2 — AMOA, MOE, Product Owner : qui fait quoi</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)">Fondamental</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Dans un projet IT, deux logiques s'affrontent : le "quoi" (le métier qui exprime ses besoins) et le "comment" (la DSI qui réalise). L'AMOA est le pont entre les deux. Quand ce pont est absent ou faible, les projets dérivent fonctionnellement — c'est exactement la situation CRM B2B et ServiceNow chez INWI.</div>
+
+      <div class="section-title">Les rôles clés</div>
+      <div class="signals">
+        <div class="signal"><span class="sig b" style="background:var(--blue-bg);border:1px solid var(--blue-b);color:var(--blue)">M</span><b>MOA — Maîtrise d'Ouvrage :</b> Le métier (Direction B2B, Direction Technique...). Exprime le besoin, valide les livrables, finance le projet. Sans MOA engagée, le projet n'a pas de sponsor — il dérive.</div>
+        <div class="signal"><span class="sig b" style="background:var(--blue-bg);border:1px solid var(--blue-b);color:var(--blue)">A</span><b>AMOA — Assistance MOA :</b> Aide le métier à formuler ses besoins en termes compréhensibles par la DSI. Rédige les cahiers des charges, réalise les recettes. Peut être interne (E&D) ou externe (cabinet).</div>
+        <div class="signal"><span class="sig b" style="background:var(--blue-bg);border:1px solid var(--blue-b);color:var(--blue)">E</span><b>MOE — Maîtrise d'Œuvre :</b> La DSI (équipes E&D). Conçoit et développe la solution. Répond au "comment".</div>
+      </div>
+
+      <div class="inwi-box"><strong>Le problème structurel INWI identifié</strong>Sur CRM B2B (RAF B2B) et ServiceNow : l'AMOA n'est pas désignée et le portage métier (Direction Technique, Direction B2B) est absent ou "on-hold". Résultat : la DSI se retrouve à piloter seule des projets dont le métier n'assume pas la maîtrise d'ouvrage. C'est un problème de gouvernance IT-Métier, pas un problème technique.</div>
+
+      <div class="section-title">En mode agile</div>
+      <p>Dans un contexte agile (Scrum), le Product Owner (PO) remplace en partie l'AMOA : il représente le métier au sein de l'équipe projet, priorise le backlog et valide les sprints. Chez INWI, E&D utilise des approches mixtes selon les projets.</p>
+
+      <div class="chips"><span class="chip g">MOA</span><span class="chip g">AMOA</span><span class="chip g">MOE</span><span class="chip g">Product Owner</span><span class="chip g">Recette</span><span class="chip g">Cahier des charges</span><span class="chip g">Backlog</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 2.3 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>2.3 — Les projets en cours chez INWI : lecture rapide</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)">INWI-Spécifique</span><span class="read-time">⏱ 8 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>5 projets structurants en cours. 2 en impasse (gouvernance), 1 en reprise après déblocage, 1 en bonne trajectoire, 1 sur le fil contractuellement. Maîtriser ces projets vous donne de la crédibilité immédiate en CODIR et avec le PDG.</div>
+
+      <div class="section-title">PHENIX — Migration billing (BSCS → Codix IMX)</div>
+      <div class="inwi-box"><strong></strong>Remplacement du système de facturation historique BSCS par Codix IMX. Avancement : <b>~35%</b>. Deux blocages récents ont été levés (Credit Set + proxification) — projet en reprise. Dérive de ~3 semaines cumulées. Jalon critique : Go/No-Go recette <b>juin 2026</b>.<br><br><b>Ce qu'il faut savoir :</b> BSCS est le système de facturation de tous les clients mobiles d'inwi. Une migration mal conduite = risque de sur/sous-facturation massive. La coexistence des deux systèmes est une période de risque élevé.</div>
+
+      <div class="section-title">RAF B2B / CRM B2B — Salesforce B2B</div>
+      <div class="inwi-box"><strong></strong>Déploiement Salesforce pour les activités B2B (grands comptes, entreprises). <b>Bloqué</b> : pas de sponsor métier désigné côté Direction B2B, AMOA non cadrée. <b>Ce que vous devez faire :</b> forcer la désignation d'un sponsor — c'est une décision PDG, pas DSI.</div>
+
+      <div class="section-title">Upgrade Comviva / inwi Money</div>
+      <div class="inwi-box"><strong></strong>Migration plateforme inwi Money vers Mobiquity X-Pay 10ème génération. <b>15% d'avancement. Bloqué</b> par situation contractuelle (contrats non signés, dates vierges). Risque juridique 8M MAD.<br><b>Action urgente :</b> saisine Direction Juridique.</div>
+
+      <div class="section-title">API Digital / OAuth2</div>
+      <div class="inwi-box"><strong></strong>Migration sécurité des APIs vers OAuth2 (remplacement des clés API statiques). <b>68% d'avancement — bonne trajectoire</b>. Livraison prévue juin 2026. Signal positif à valoriser avec le PDG.</div>
+
+      <div class="section-title">ServiceNow — ITSM</div>
+      <div class="inwi-box"><strong></strong>Déploiement ServiceNow comme outil ITSM centralisé. Même problème que CRM B2B : portage par la Direction Technique "on-hold", AMOA non désignée. Le projet stagne.</div>
+
+      <div class="chips"><span class="chip o">PHENIX</span><span class="chip o">RAF B2B</span><span class="chip o">Comviva</span><span class="chip o">OAuth2</span><span class="chip o">ServiceNow</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 2.4 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>2.4 — Méthodes de delivery : waterfall, agile, cycle en V</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)">Fondamental</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Il n'y a pas une méthode universelle. Le choix dépend de la nature du projet, de la maturité des équipes et du degré de clarté des besoins. Chez INWI, les deux coexistent : waterfall sur les projets structurants (PHENIX, Comviva), agile sur les projets digitaux et les évolutions Salesforce.</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig ok">W</span><b>Waterfall (cycle en V) :</b> Phases séquentielles — Cadrage → Conception → Développement → Recette → MEP. Adapté aux projets avec périmètre figé et fort impact sur les systèmes core (billing, provisioning). Risque : les problèmes se découvrent tard (en recette).</div>
+        <div class="signal"><span class="sig ok">A</span><b>Agile (Scrum) :</b> Itérations courtes (sprints de 2 semaines). Le métier valide régulièrement. Adapté aux projets fonctionnels évolutifs (CRM, portails). Risque : nécessite un Product Owner disponible — problème récurrent chez INWI.</div>
+      </div>
+
+      <div class="inwi-box"><strong>Ce qu'il faut challenger à E&D</strong>Quelle est la méthode utilisée par projet ? Est-ce que le choix de la méthode est documenté et justifié ? La direction E&D a-t-elle un référentiel de delivery standardisé ou chaque projet décide seul ? Un PMO (Project Management Office) existe-t-il ?</div>
+
+      <div class="chips"><span class="chip g">Sprint</span><span class="chip g">MEP</span><span class="chip g">Recette UAT</span><span class="chip g">Go Live</span><span class="chip g">PMO</span><span class="chip g">Kanban</span><span class="chip g">Definition of Done</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 3 : ARCHITECTURE ===================== -->
+<div id="m3" class="module">
+  <div class="module-header">
+    <span class="tag" style="background:var(--purple-bg);border:1px solid var(--purple-b);color:var(--purple)">Module 3</span>
+    <h2>Architecture IT &amp; Urbanisme du SI</h2>
+    <p>Comprendre comment le SI d'INWI est structuré, lire une architecture HLD et converser avec votre directeur Architecture.</p>
+  </div>
+
+  <!-- Fiche 3.1 -->
+  <div class="fiche open">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>3.1 — Lire l'architecture HLD d'INWI (document Architecture)</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)">INWI-Spécifique</span><span class="read-time">⏱ 8 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>L'architecture HLD (High Level Design) d'INWI montre l'ensemble des systèmes applicatifs classés par couches fonctionnelles. Elle vous permet de comprendre "qui fait quoi" dans le SI, comment les systèmes communiquent, et où se situent les risques de concentration technologique.</div>
+
+      <div class="section-title">Les couches de l'architecture INWI</div>
+      <div class="schema">
+<span class="hl">COUCHE CANAUX (Comment le client accède)</span><br>
+  Boutiques (Salesforce) · Partenaires (Salesforce) · Web inwi.ma<br>
+  MyInwi · Selfcare B2B · IVR Genesys · WhatsApp · CRC<br><br>
+<span class="hl">COUCHE INTÉGRATION (Comment les systèmes parlent entre eux)</span><br>
+  API Management : <b>APIGEE</b><br>
+  Enterprise Service Bus : <b>Oracle SOA</b><br>
+  Event Streaming : <b>Kafka</b><br><br>
+<span class="hl">COUCHE APPLICATIONS MÉTIER</span><br>
+  CRM/Vente : <b>Salesforce</b> (Sales, Service, Marketing, Comms Cloud)<br>
+  Facturation : <b>Codix IMX</b> (remplacement BSCS) · Paiement : <b>PAYX/HPS</b><br>
+  ERP : <b>SAP</b> (Finance, RH, Achats, Logistique)<br>
+  inwi Money : <b>Comviva Mobiquity</b><br>
+  ITSM : <b>ServiceNow</b><br><br>
+<span class="hl">COUCHE OPÉRATIONS / RÉSEAU</span><br>
+  Supervision : <b>Centreon</b> · Monitoring : <b>Dynatrace</b><br>
+  Provisioning : <b>Nokia</b> · Médiation : <b>Nokia</b><br>
+  Roaming : <b>BASSET</b> · Interco : <b>CSG International</b>
+      </div>
+
+      <div class="inwi-box"><strong>Ce que révèle cette architecture</strong>Forte concentration sur <b>Salesforce</b> (CRM, vente, marketing, service = 4 clouds Salesforce). Fort investissement <b>SAP</b> côté corporate. <b>Oracle SOA</b> comme bus d'intégration central = point de fragilité si sous-dimensionné. <b>Dynatrace</b> déployé mais sous-exploité — c'est une opportunité de quick-win (meilleure visibilité sans nouveau budget).</div>
+
+      <div class="section-title">Questions à poser à Architecture</div>
+      <div class="signals">
+        <div class="signal"><span class="sig q">?</span>Quelle est la version actuelle d'Oracle SOA ? Y a-t-il un plan de migration vers une architecture plus moderne (API-first / event-driven) ?</div>
+        <div class="signal"><span class="sig q">?</span>APIGEE est-il le point d'entrée unique pour toutes les APIs externes ? Ou y a-t-il des APIs "sauvages" non governées ?</div>
+        <div class="signal"><span class="sig q">?</span>Kafka est-il utilisé en production sur quels flux critiques ? Quelle est la maturité de l'équipe sur cet outil ?</div>
+      </div>
+
+      <div class="chips"><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">HLD</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">APIGEE</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">Oracle SOA</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">Kafka</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">Salesforce</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">SAP</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 3.2 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>3.2 — Urbanisme du SI : ce que c'est, pourquoi ça compte</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-b)">Fondamental</span><span class="read-time">⏱ 6 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>L'urbanisme du SI, c'est la discipline qui organise le SI comme une ville : des quartiers (domaines), des routes (interfaces), des règles de construction (standards). Sans urbanisme, le SI devient une jungle de systèmes disparates, d'interfaces ad-hoc et de dette technique qui ralentit tout nouveau projet.</div>
+
+      <div class="section-title">Les concepts clés</div>
+      <div class="signals">
+        <div class="signal"><span class="sig ok">✓</span><b>Domaine fonctionnel :</b> Bloc cohérent de fonctions métier (ex : "Facturation", "CRM", "RH"). L'urbanisme découpe le SI en domaines avec des frontières claires.</div>
+        <div class="signal"><span class="sig ok">✓</span><b>API-first :</b> Toute fonctionnalité exposée via une API documentée. Les systèmes ne se parlent pas "en direct" — ils passent par les APIs. Chez INWI, APIGEE est le gardien de cette logique.</div>
+        <div class="signal"><span class="sig w">!</span><b>Dette technique :</b> Accumulation de solutions "vite faites" qui compliquent les évolutions futures. Un SI avec beaucoup de dette prend 3× plus de temps à faire évoluer. BSCS en fin de vie est une dette majeure — d'où PHENIX.</div>
+        <div class="signal"><span class="sig kO">✗</span><b>Système "spaghetti" :</b> Interfaces point-à-point non gouvernées. Si système A parle directement à systèmes B, C et D sans passer par l'ESB ou l'API Manager — c'est du spaghetti. Très difficile à maintenir.</div>
+      </div>
+
+      <div class="inwi-box"><strong>La vision Architecture INWI 2026</strong>Le document "Executive Brief CODIR Vision Architecture 2026" positionne une cible en 4 axes : consolidation Salesforce, rationalisation des intégrations (ESB → API), modernisation Billing (PHENIX), et gouvernance des données. C'est une feuille de route sur 2-3 ans — votre rôle est de la tenir et de la financer.</div>
+
+      <div class="chips"><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">Domaine</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">API-first</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">ESB</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">Dette technique</span><span class="chip" style="border-color:var(--purple-b);color:var(--purple);background:var(--purple-bg)">Roadmap architecture</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 3.3 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>3.3 — Focus Vente–Facturation : les flux à maîtriser</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)">INWI-Spécifique</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Le flux Vente → Facturation est le flux le plus critique du SI d'un opérateur. Il relie la commande client jusqu'à l'encaissement. Chez INWI, ce flux implique 7 systèmes différents et est en cours de refonte (PHENIX). Tout incident sur ce flux a un impact direct sur le chiffre d'affaires.</div>
+
+      <div class="schema">
+<span class="hl">Salesforce Comms Cloud</span>  →  Commande client, CPQ<br>
+    ↓ (via Oracle SOA / APIGEE)<br>
+<span class="hl">Salesforce Sales Cloud</span>  →  Validation, vue 360° client<br>
+    ↓<br>
+<span class="hl2">Nokia Provisioning</span>  →  Activation réseau<br>
+    ↓  (CDRs)<br>
+<span class="hl2">Nokia Médiation</span>  →  Collecte usages (voix/data/SMS)<br>
+    ↓<br>
+<span class="hl">Codix IMX</span>  →  Rating (valorisation) + composition facture<br>
+    ↓<br>
+<span class="hl3">PAYX / HPS PowerCard</span>  →  Encaissement paiement
+      </div>
+
+      <div class="inwi-box"><strong>Pendant la migration PHENIX</strong>BSCS et Codix IMX coexistent. Certains clients sont facturés par l'un, d'autres par l'autre. La "Credit Set" (mécanisme de correction) est critique pour éviter les incidents de facturation. C'est l'un des deux points qui avait bloqué PHENIX et qui vient d'être arbitré.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 4 : SUPPORT/EXPLOITATION ===================== -->
+<div id="m4" class="module">
+  <div class="module-header">
+    <span class="tag" style="background:var(--orange-bg);border:1px solid var(--orange-b);color:var(--orange)">Module 4</span>
+    <h2>Support, Supervision &amp; Exploitation</h2>
+    <p>Maîtriser les fondamentaux de l'ITSM, lire un dashboard de supervision et converser avec votre direction S&E.</p>
+  </div>
+
+  <!-- Fiche 4.1 -->
+  <div class="fiche open">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>4.1 — ITSM : Incidents, Problèmes, Changements (ServiceNow)</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)">Fondamental</span><span class="read-time">⏱ 7 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>L'ITSM (IT Service Management) c'est la gestion structurée des opérations IT selon des processus standardisés (référentiel ITIL). Chez INWI, l'outil cible est ServiceNow. Maîtriser la distinction Incident / Problème / Changement est indispensable pour piloter S&E et lire les rapports opérationnels.</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig kO">!</span><b>INCIDENT :</b> Une interruption non planifiée d'un service. Objectif : restaurer le service le plus vite possible (MTTR). Priorité P1 (critique) → P4 (mineur). Chez INWI : MTTR P1 cible &lt;4h.</div>
+        <div class="signal"><span class="sig w">!</span><b>PROBLÈME :</b> La cause racine d'un ou plusieurs incidents récurrents. Résoudre un incident ne résout pas le problème. Chez INWI, les 14 alertes répétitives identifiées en production sont des problèmes non résolus — on traite les incidents mais pas les causes racines.</div>
+        <div class="signal"><span class="sig ok">→</span><b>CHANGEMENT :</b> Toute modification planifiée du SI (déploiement, mise à jour, reconfiguration). Doit passer par un processus de validation pour éviter les régressions. Taux "MEP sans régression" = qualité du processus changement.</div>
+      </div>
+
+      <div class="inwi-box"><strong>La situation ServiceNow chez INWI</strong>ServiceNow est l'outil ITSM cible déployé partiellement. Le projet d'extension (notamment module Changements et CMDB complète) est bloqué faute de sponsor Direction Technique. En attendant, certains processus sont gérés hors-outil (email, Excel) — ce qui crée des angles morts dans le pilotage.</div>
+
+      <div class="section-title">KPIs ITSM à connaître</div>
+      <div class="chips">
+        <span class="chip o">MTTR (temps résolution)</span>
+        <span class="chip o">MTBF (fréquence incidents)</span>
+        <span class="chip o">Taux réouverture</span>
+        <span class="chip o">Backlog P1/P2</span>
+        <span class="chip o">MEP sans régression</span>
+        <span class="chip o">SLA tenu</span>
+        <span class="chip o">% changements réussis</span>
+      </div>
+
+      <div class="section-title">Questions intelligentes à S&E</div>
+      <div class="signals">
+        <div class="signal"><span class="sig q">?</span>Quel est le ratio Incidents / Problèmes documentés ? Si on résout 100 incidents par mois et qu'on n'a que 5 problèmes documentés, c'est un signal de maturité faible en gestion de problèmes.</div>
+        <div class="signal"><span class="sig q">?</span>Quel est le taux de changements passés en CAB (Change Advisory Board) vs changements d'urgence non planifiés ?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fiche 4.2 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>4.2 — Supervision et monitoring : Centreon et Dynatrace</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)">INWI-Spécifique</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>La supervision c'est voir en temps réel l'état de santé du SI. Chez INWI, deux outils coexistent : Centreon (supervision infrastructure — serveurs, réseau) et Dynatrace (monitoring applicatif — performance des applications, expérience utilisateur). Dynatrace est déployé mais sous-exploité — c'est une opportunité de quick-win.</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig ok">✓</span><b>Centreon :</b> Supervision "infrastructure" — état des serveurs, liens réseau, stockage, seuils d'alerte. Vue technique/infra. Les 14 alertes répétitives identifiées en production transitent par Centreon.</div>
+        <div class="signal"><span class="sig w">!</span><b>Dynatrace :</b> Monitoring "applicatif" (APM) — performance des applications, temps de réponse, erreurs applicatives, expérience utilisateur réelle. Déployé chez INWI mais pas encore pleinement exploité par les équipes.</div>
+      </div>
+
+      <div class="inwi-box"><strong>Le problème des alertes répétitives</strong>L'analyse S&E identifie 14 alertes récurrentes en production (même alerte → même système → même résolution → recommence). C'est un indicateur de maturité faible en gestion de problèmes. La bonne question : pourquoi ces alertes ne sont-elles pas transformées en problèmes avec plan de résolution définitive ?</div>
+
+      <div class="section-title">Question DSI à poser</div>
+      <div class="signals">
+        <div class="signal"><span class="sig q">?</span>Avons-nous un tableau de bord unique (single pane of glass) qui consolide Centreon et Dynatrace ? Ou les équipes doivent-elles consulter deux outils séparément ?</div>
+        <div class="signal"><span class="sig q">?</span>Dynatrace est-il configuré pour alerter proactivement avant l'incident (ex : tendance de dégradation) ou seulement après ?</div>
+      </div>
+
+      <div class="chips"><span class="chip o">Centreon</span><span class="chip o">Dynatrace</span><span class="chip o">APM</span><span class="chip o">Alerte répétitive</span><span class="chip o">Seuil</span><span class="chip o">Taux disponibilité</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 4.3 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>4.3 — SLA, OLA et PCA : les engagements de service</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)">Fondamental</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>SLA, OLA et PCA sont les "contrats" qui définissent ce que la DSI s'engage à livrer — en temps normal (SLA/OLA) et en cas de sinistre (PCA). Ne pas les connaître, c'est piloter à l'aveugle. Chez INWI, le PCA/PRA n'est pas encore validé — c'est le risque le plus sérieux du moment.</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig ok">S</span><b>SLA (Service Level Agreement) :</b> Engagement de la DSI vis-à-vis des utilisateurs/métiers. Ex : "Salesforce B2C disponible à 99.9% / mois". Contient aussi le temps de résolution des incidents par priorité.</div>
+        <div class="signal"><span class="sig ok">O</span><b>OLA (Operational Level Agreement) :</b> Engagement interne entre équipes DSI. Ex : l'équipe infra s'engage à restaurer un serveur en &lt;2h pour que l'équipe S&E puisse respecter son SLA de 4h. L'OLA est la "mécanique" derrière le SLA.</div>
+        <div class="signal"><span class="sig kO">P</span><b>PCA (Plan de Continuité d'Activité) :</b> Procédures à activer en cas de sinistre majeur (datacenter HS, cyberattaque...) pour maintenir les services critiques. Le PRA (Plan de Reprise) définit comment on revient à la normale. Chez INWI : PCA non testé et responsabilité non tranchée entre OPS et INFRA.</div>
+      </div>
+
+      <div class="alert-box"><strong>⚡ Risque identifié INWI</strong>Le PCA/PRA n'a pas fait l'objet d'un test complet récent et la responsabilité de son maintien n'est pas clairement attribuée entre la direction Exploitation/OPS et la direction Infrastructure. En cas de sinistre majeur, ce flou organisationnel coûte des heures de récupération. Arbitrage à traiter avant fin juin.</div>
+
+      <div class="chips"><span class="chip g">SLA</span><span class="chip g">OLA</span><span class="chip g">PCA</span><span class="chip g">PRA</span><span class="chip g">RPO</span><span class="chip g">RTO</span><span class="chip g">Datacenter</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 5 : RÉSEAU TÉLÉCOM ===================== -->
+<div id="m5" class="module">
+  <div class="module-header">
+    <span class="tag" style="background:var(--teal-bg);border:1px solid var(--teal-b);color:var(--teal)">Module 5</span>
+    <h2>Réseau Télécom — Notions essentielles pour un DSI</h2>
+    <p>Pas pour devenir ingénieur réseau — pour comprendre les conversations, identifier les frontières et poser les bonnes questions.</p>
+  </div>
+
+  <!-- Fiche 5.1 -->
+  <div class="fiche open">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>5.1 — Les 3 couches du réseau télécom (RAN, Core, Transport)</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-b)">Fondamental</span><span class="read-time">⏱ 6 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Le réseau télécom se divise en 3 couches. En tant que DSI, vous n'en êtes pas responsable — mais vous devez comprendre où s'arrête le réseau et où commence votre périmètre (la médiation et le provisioning sont vos deux points de contact avec le réseau).</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig ok">1</span><b>RAN — Radio Access Network :</b> Les antennes que vous voyez sur les toits et les pylônes. Elles reçoivent les signaux des téléphones (4G/5G). Ce que vous devez savoir : une dégradation réseau radio peut être confondue avec un incident SI — c'est le premier point de friction avec la Direction Réseau.</div>
+        <div class="signal"><span class="sig ok">2</span><b>Transport :</b> Le réseau de "routes" qui relie les antennes au cœur de réseau. Fibres optiques, liens microondes. Un problème de transport = coupure de zone entière, pas d'un client individuel.</div>
+        <div class="signal"><span class="sig ok">3</span><b>Core Network :</b> Le cerveau du réseau. Gère l'authentification des SIM, le routage des appels/data, les connexions Internet. En 4G, on parle d'EPC (Evolved Packet Core). En 5G, c'est le 5G Core (NGC). C'est ici que Nokia Provisioning parle au réseau pour activer les services.</div>
+      </div>
+
+      <div class="schema">
+[Téléphone client] ←→ <span class="hl2">ANTENNE 4G/5G (RAN)</span><br>
+    ↓ (lien radio)<br>
+<span class="hl2">TRANSPORT</span> (fibre, microonde)<br>
+    ↓<br>
+<span class="hl2">CORE NETWORK</span> (EPC/5G Core) — authentification, routing<br>
+    ↓ ←→ <span class="hl">Nokia PROVISIONING (DSI)</span> — activation services<br>
+    ↓ → CDRs → <span class="hl">Nokia MÉDIATION (DSI)</span> → Billing
+      </div>
+
+      <div class="inwi-box"><strong>Ce que vous devez retenir</strong>Quand un service client est dégradé, la première question est : est-ce un problème radio/transport/core (→ Direction Réseau) ou un problème applicatif/SI (→ DSI) ? Chez INWI, cette distinction n'est pas toujours claire — d'où l'importance de définir la frontière avec des OLA réseaux-SI.</div>
+
+      <div class="chips"><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">RAN</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">BTS/NodeB</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">EPC</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">5G Core</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">HLR/HSS</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">MSISDN</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 5.2 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>5.2 — 4G, 5G, USSD : ce qu'un DSI doit savoir</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-b)">Pratique</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Vous n'avez pas besoin de comprendre la 5G techniquement. Vous devez comprendre les implications SI : chaque évolution réseau génère des projets SI (nouvelle médiation, nouveaux CDRs, nouveaux formats). La 5G et l'USSD ont des impacts directs sur votre périmètre.</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig ok">4</span><b>4G LTE :</b> Technologie dominante chez inwi aujourd'hui. Tout passe par IP (voix, data, SMS). La médiation Nokia collecte des CDRs IP. Le SI billing doit savoir valoriser des usages data (par Go consommé, par session...).</div>
+        <div class="signal"><span class="sig ok">5</span><b>5G :</b> Les ambitions inwi existent. Implication SI : nouveaux formats de CDRs (network slicing, MEC), nouveaux besoins de rating en quasi temps réel. PHENIX/Codix IMX est en partie choisi pour cette évolutivité 5G.</div>
+        <div class="signal"><span class="sig kO">U</span><b>USSD :</b> Protocole GSM très ancien (*123# par exemple). Encore utilisé pour inwi Money et certains selfcares. Problème : USSD n'est pas fait pour les applications modernes. Migration vers App/API est un enjeu architectural. Comviva Mobiquity actuel repose encore sur USSD — raison supplémentaire pour l'upgrade.</div>
+      </div>
+
+      <div class="inwi-box"><strong>Ce que ça implique pour vous</strong>Quand la Direction Réseau annonce un upgrade 5G, c'est un projet SI associé : médiation, billing, supervision. La DSI doit être dans la boucle dès la phase de planification réseau — pas en fin de course quand le réseau est déployé et que le SI ne suit pas.</div>
+
+      <div class="chips"><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">LTE</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">5G NR</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">USSD</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">CDR IP</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">Network Slicing</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">MEC</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 5.3 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>5.3 — Vocabulaire réseau essentiel pour réunions mixtes</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-b)">Vocabulaire</span><span class="read-time">⏱ 4 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>En réunion avec la Direction Réseau ou le PDG, ces termes apparaissent souvent. Les connaître vous évite d'être perdu et vous permet de poser des questions pertinentes sur les implications SI.</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig ok">→</span><b>QoS (Quality of Service) :</b> Priorisation des flux réseau. Si la QoS dégrade, les applications SI (notamment inwi Money, appels VoIP) en souffrent les premières.</div>
+        <div class="signal"><span class="sig ok">→</span><b>Roaming :</b> Utilisation du réseau d'un autre opérateur à l'étranger. Chez inwi : géré par BASSET (côté SI). Les CDRs de roaming sont facturés différemment — interface bi-latérale avec opérateurs étrangers.</div>
+        <div class="signal"><span class="sig ok">→</span><b>Interconnexion :</b> Les appels/SMS entre clients inwi et clients d'autres opérateurs (IAM, Orange...). Géré par CSG International côté SI. Enjeux : réconciliation des trafics et facturation inter-opérateurs.</div>
+        <div class="signal"><span class="sig ok">→</span><b>VoLTE (Voice over LTE) :</b> Appels voix sur réseau 4G (qualité HD). Si le réseau passe en VoLTE, le SI doit savoir générer et valoriser les CDRs correspondants.</div>
+        <div class="signal"><span class="sig ok">→</span><b>Coverage / Couverture :</b> Zone géographique couverte par le réseau. Un "trou de couverture" n'est pas un incident SI — mais si un client se plaint d'un problème de service, ça peut être soit couverture (réseau) soit applicatif (SI). D'où l'importance du diagnostic.</div>
+      </div>
+
+      <div class="chips"><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">QoS</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">Roaming</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">Interco</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">VoLTE</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">Coverage</span><span class="chip" style="border-color:var(--teal-b);color:var(--teal);background:var(--teal-bg)">Churn</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODULE 6 : PILOTAGE & GOUVERNANCE ===================== -->
+<div id="m6" class="module">
+  <div class="module-header">
+    <span class="tag" style="background:var(--red-bg);border:1px solid var(--red-b);color:var(--red)">Module 6</span>
+    <h2>Pilotage &amp; Gouvernance SI</h2>
+    <p>Les instances, les budgets, les KPIs et la gouvernance IT-Métier — le terrain sur lequel vous opérez comme DSI.</p>
+  </div>
+
+  <!-- Fiche 6.1 -->
+  <div class="fiche open">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>6.1 — Les instances de gouvernance : CODIR, COMEX, COPIL</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-b)">Fondamental</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Il existe 3 niveaux de gouvernance SI : le niveau stratégique (COMEX/PDG), le niveau DSI (CODIR DSI), et le niveau projet (COPIL). Chaque niveau a son agenda, ses participants et son format. Confondre les niveaux = parler des mauvaises choses aux mauvaises personnes.</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig kO">▲</span><b>COMEX / PDG :</b> Niveau stratégique. Fréquence : mensuelle ou sur événement. Ce qu'on y amène : situation globale DSI (état de santé), projets bloqués nécessitant arbitrage, budget. Ce qu'on n'y amène pas : les détails techniques, les incidents de la semaine.</div>
+        <div class="signal"><span class="sig w">■</span><b>CODIR DSI :</b> Gouvernance interne de la DSI. Participants : vous + vos 5 N-1. Fréquence : hebdomadaire (opérationnel) + mensuel (stratégique). C'est votre espace de pilotage collectif, d'alignement et de décision DSI.</div>
+        <div class="signal"><span class="sig ok">●</span><b>COPIL Projet :</b> Gouvernance d'un projet spécifique. Participants : DSI + Direction Métier sponsor + chef de projet. Fréquence : mensuelle ou bi-mensuelle. Traite l'avancement, les risques et les décisions du projet.</div>
+      </div>
+
+      <div class="inwi-box"><strong>Ce que vous devez structurer maintenant</strong>Votre 1er CODIR DSI est à cadrer : format hebdomadaire (dashboard + alertes + engagements) + format mensuel (projets + budget + gouvernance). Les règles de fonctionnement à poser dès la 1ère session : qui prépare quoi, délai de remontée des alertes, principe "pas de surprises en séance".</div>
+
+      <div class="chips"><span class="chip r">CODIR</span><span class="chip r">COMEX</span><span class="chip r">COPIL</span><span class="chip r">COPRO</span><span class="chip r">Steering Committee</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 6.2 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>6.2 — Lire un budget IT : CAPEX vs OPEX</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-b)">Fondamental</span><span class="read-time">⏱ 6 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Le budget DSI se lit en deux colonnes : CAPEX (investissements) et OPEX (fonctionnement). Un projet DSI consomme du CAPEX au démarrage, puis génère de l'OPEX permanent (maintenance, licences, TMA). La tension structurelle : les directions métier demandent toujours plus de projets (CAPEX) sans intégrer le coût OPEX récurrent que ça génère.</div>
+
+      <div class="signals">
+        <div class="signal"><span class="sig ok">C</span><b>CAPEX (Capital Expenditure) :</b> Investissements — développements, achats de licences, matériel. Amorti sur plusieurs années. Ex : le projet PHENIX est un CAPEX. Validé en budget annuel ou en business case spécifique.</div>
+        <div class="signal"><span class="sig w">O</span><b>OPEX (Operating Expenditure) :</b> Charges courantes — TMA (Tierce Maintenance Applicative), licences annuelles (Salesforce, SAP, Oracle...), hébergement, infogérance. Se répète chaque année. Chez INWI : DSI - OPEX - 2026.xlsx est le budget de fonctionnement à analyser.</div>
+        <div class="signal"><span class="sig kO">!</span><b>Le piège du "run vs build" :</b> Plus le SI grossit, plus l'OPEX de maintenance augmente, moins il reste de budget pour innover (build). Un DSI doit maintenir un ratio run/build sain — typiquement 60-70% run / 30-40% build en opérateur télécom.</div>
+      </div>
+
+      <div class="inwi-box"><strong>Ce qu'il faut demander à P&G</strong>Quel est le ratio CAPEX/OPEX actuel ? Quel est le taux de consommation budgétaire à date vs budget alloué ? Quelles sont les lignes d'OPEX qui ont le plus crû ces 3 dernières années ? Quels projets ont généré de l'OPEX permanent sous-estimé ?</div>
+
+      <div class="section-title">Vocabulaire budget DSI</div>
+      <div class="chips"><span class="chip r">CAPEX</span><span class="chip r">OPEX</span><span class="chip r">TMA</span><span class="chip r">Licences</span><span class="chip r">Infogérance</span><span class="chip r">Run vs Build</span><span class="chip r">Business Case</span><span class="chip r">ROI</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 6.3 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>6.3 — Gouvernance IT-Métier : le problème structurel à résoudre</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)">INWI-Spécifique</span><span class="read-time">⏱ 6 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>La gouvernance IT-Métier c'est le modèle qui définit qui décide quoi dans les projets SI : qui exprime le besoin, qui finance, qui valide, qui pilote. Chez INWI, ce modèle n'est pas formalisé — c'est la cause racine de la plupart des projets bloqués (CRM B2B, ServiceNow).</div>
+
+      <div class="section-title">Le modèle à construire</div>
+      <div class="signals">
+        <div class="signal"><span class="sig ok">1</span><b>Sponsor métier obligatoire :</b> Tout projet SI &gt;X MAD nécessite un sponsor nommé côté métier (directeur ou VP). Sans sponsor = pas de démarrage. Cette règle doit être approuvée par le PDG/COMEX pour être opposable.</div>
+        <div class="signal"><span class="sig ok">2</span><b>Comité IT-Métier :</b> Instance mensuelle réunissant DSI + Directions métier clés pour prioriser les demandes SI, valider les arbitrages budget et suivre les projets en cours. Le DSI co-préside — pas en solo.</div>
+        <div class="signal"><span class="sig ok">3</span><b>Catalogue de services DSI :</b> Document qui liste ce que la DSI fournit, à quel coût, avec quels SLA. Rend la relation DSI-Métier transparente et commerciale (chargeback ou au moins visibilité).</div>
+      </div>
+
+      <div class="inwi-box"><strong>La situation INWI aujourd'hui</strong>CRM B2B : Direction B2B ne désigne pas d'AMOA, Direction Technique "sponsor" est on-hold. ServiceNow : Direction Technique n'assume pas le portage. Résultat : la DSI porte seule des projets dont elle n'est pas censée être le seul driver. Quand ils échouent, c'est la DSI qui est montrée du doigt. L'arbitrage PDG sur la désignation de sponsors est un acte fondateur de gouvernance.</div>
+
+      <div class="chips"><span class="chip r">Sponsor métier</span><span class="chip r">Comité IT-Métier</span><span class="chip r">Catalogue services</span><span class="chip r">Chargeback</span><span class="chip r">Demande SI</span><span class="chip r">Priorisation</span></div>
+    </div>
+  </div>
+
+  <!-- Fiche 6.4 -->
+  <div class="fiche">
+    <div class="fiche-header" onclick="toggle(this)">
+      <div><h3>6.4 — Piloter un consultant externe (cas Olivier)</h3></div>
+      <div class="meta"><span class="fiche-tag" style="background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-b)">INWI-Spécifique</span><span class="read-time">⏱ 5 min</span><span class="chevron">▼</span></div>
+    </div>
+    <div class="fiche-body">
+      <div class="essentiel"><strong>L'essentiel</strong>Un consultant diagnostique externe (comme Olivier) est un outil stratégique — à condition de le cadrer. Son diagnostic OPS (60.9% de maturité inwi) est une donnée utile. Mais son agenda, son périmètre et ses recommandations doivent être maîtrisés par le DSI, pas l'inverse.</div>
+
+      <div class="section-title">Ce que révèle le diagnostic Olivier</div>
+      <p>L'évaluation de maturité OPS place inwi à 60.9% sur l'échelle de son référentiel (vs Opus à 46.9%). Le score en soi est secondaire — ce qui compte, c'est la cartographie des axes d'amélioration qu'il produit et comment vous allez les prioriser en fonction de votre stratégie DSI, pas de la sienne.</p>
+
+      <div class="signals">
+        <div class="signal"><span class="sig q">?</span>Avant son retour (dans ~2 semaines) : valider son périmètre d'intervention exact. Diagnostic seul ? Plan de transformation ? Pilotage ? Les trois ont des implications très différentes en termes de coût, de durée et de gouvernance.</div>
+        <div class="signal"><span class="sig q">?</span>Qui a commandité Olivier ? Était-ce votre prédécesseur ou une direction ? Votre légitimité à recadrer la mission dépend de cette réponse.</div>
+        <div class="signal"><span class="sig w">!</span>Risque : un consultant qui a un accès direct à vos N-1 sans votre contrôle peut créer des tensions et des agendas parallèles. Posez le principe : toutes les interactions consultants → N-1 passent par vous ou vous en êtes informé.</div>
+      </div>
+
+      <div class="inwi-box"><strong>Les 3 questions à lui poser à son retour</strong>1. Quelle est votre recommandation prioritaire, et pourquoi elle plutôt qu'une autre ? 2. Comment mesurez-vous le succès de votre mission ? 3. Quelles sont les conditions d'échec que vous avez identifiées ?</div>
+
+      <div class="chips"><span class="chip o">Maturité OPS</span><span class="chip o">Plan de transformation</span><span class="chip o">Benchmark</span><span class="chip o">Gouvernance consultant</span></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.mod-item').forEach(a => a.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('main').scrollTop = 0;
+}
+
+function toggle(header) {
+  const fiche = header.closest('.fiche');
+  fiche.classList.toggle('open');
+}
+
+// Open first fiche of each module by default (already done in HTML)
+// Track read fiches
+const read = JSON.parse(localStorage.getItem('fiches_read') || '{}');
+document.querySelectorAll('.fiche-header').forEach(h => {
+  h.addEventListener('click', () => {
+    const id = h.closest('.fiche').id || h.closest('.module').id + '_' + [...h.closest('.module').querySelectorAll('.fiche')].indexOf(h.closest('.fiche'));
+    read[id] = true;
+    localStorage.setItem('fiches_read', JSON.stringify(read));
+  });
+});
+</script>
+</body>
+</html>
