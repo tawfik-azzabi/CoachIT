@@ -93,9 +93,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 p{color:var(--muted);font-size:13px;margin-bottom:10px;line-height:1.6}
 p:last-child{margin-bottom:0}
+
+/* GLOSSAIRE */
+.gloss-search{margin-bottom:14px}
+.gloss-search input{width:100%;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
+.gloss-search input:focus{border-color:var(--blue-b)}
+.gloss-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.gcat{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:.15s}
+.gcat:hover{border-color:var(--blue-b);color:var(--blue)}
+.gcat.active{background:var(--blue-bg);border-color:var(--blue-b);color:var(--blue)}
+#glossList{display:flex;flex-direction:column;gap:2px}
+.gterm{padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;transition:.1s}
+.gterm:hover{border-color:rgba(255,255,255,.12)}
+.gterm-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.gterm-def{font-size:12px;color:var(--muted);line-height:1.55}
+.gterm-inwi{font-size:11px;color:var(--orange);margin-top:5px;padding-top:5px;border-top:1px solid rgba(245,158,11,.15);line-height:1.5}
+.gterm-inwi::before{content:'INWI → ';font-weight:700}
+.gterm[style*="none"]{display:none!important}
+.gloss-count{font-size:11px;color:var(--muted);margin-bottom:10px}
+
+/* MOBILE */
+#ham{display:none;position:fixed;top:12px;left:12px;z-index:300;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 11px;cursor:pointer;font-size:18px;color:var(--text);line-height:1;width:38px;height:38px;align-items:center;justify-content:center}
+#overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6)}
+@media(max-width:700px){
+  #ham{display:flex}
+  body{display:block}
+  #sidebar{position:fixed;left:-270px;top:0;height:100vh;z-index:250;transition:left .22s ease;width:260px}
+  #sidebar.open{left:0;box-shadow:8px 0 30px rgba(0,0,0,.6)}
+  #overlay.show{display:block}
+  #main{padding:16px 14px;padding-top:60px;max-width:100%;min-height:100vh}
+  .health-grid{grid-template-columns:1fr 1fr}
+  .arb-options.cols-3{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
+<button id="ham" onclick="toggleSidebar()" title="Menu">☰</button>
+<div id="overlay" onclick="toggleSidebar()"></div>
 
 <!-- SIDEBAR -->
 <nav id="sidebar">
@@ -150,6 +184,13 @@ p:last-child{margin-bottom:0}
       <span class="num">6</span>Pilotage &amp; Gouvernance SI
     </a>
     <div class="progress-bar"><div class="progress-fill" style="background:#ef4444;width:0%" id="p6"></div></div>
+  </div>
+
+  <div class="mod-group">
+    <div class="mod-label"><span class="mod-dot" style="background:#6366f1"></span>Référence</div>
+    <a class="mod-item" onclick="show('m7')" href="#">
+      <span class="num">G</span>Glossaire technique
+    </a>
   </div>
 
   <footer>INWI · DSI · Tawfik Azzabi · 2026<br>Module Infrastructure à venir</footer>
@@ -788,6 +829,489 @@ Nokia <b>Provisioning</b> → SI → activation services réseau<br>
   </div>
 </div>
 
+
+<!-- ===================== MODULE 7 : GLOSSAIRE ===================== -->
+<div id="m7" class="module">
+  <div class="module-header">
+    <span class="tag" style="background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);color:#6366f1">Glossaire</span>
+    <h2>Glossaire Technique DSI</h2>
+    <p>Définitions contextualisées — intégration, réseau, ITSM, continuité. Termes marqués INWI → adaptés à votre environnement.</p>
+  </div>
+
+  <div class="gloss-search">
+    <input type="text" id="glossSearch" placeholder="🔍  Rechercher un terme (ex: CMDB, Kafka, VoLTE...)">
+  </div>
+
+  <div class="gloss-cats">
+    <button class="gcat active" data-cat="all">Tous <span id="glossTotal"></span></button>
+    <button class="gcat" data-cat="integration">Intégration SI</button>
+    <button class="gcat" data-cat="bss">BSS</button>
+    <button class="gcat" data-cat="oss">OSS & Field</button>
+    <button class="gcat" data-cat="reseau-core">Réseau Core</button>
+    <button class="gcat" data-cat="reseau-acces">Accès & Transport</button>
+    <button class="gcat" data-cat="itsm">ITSM & CMDB</button>
+    <button class="gcat" data-cat="continuite">Continuité & Résilience</button>
+    <button class="gcat" data-cat="ops">Opérations & SRE</button>
+    <button class="gcat" data-cat="standards">Standards</button>
+  </div>
+
+  <div class="gloss-count" id="glossCount"></div>
+
+  <div id="glossList">
+
+<!-- ═══════════ INTÉGRATION SI ═══════════ -->
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">API Digital</div>
+  <div class="gterm-def">Interface numérique standardisée permettant à deux systèmes de communiquer via le protocole HTTP/REST. Le terme "API Digital" désigne aussi bien la technologie que le programme de modernisation des échanges applicatifs d'un opérateur.</div>
+  <div class="gterm-inwi">Programme en cours à 68% — migration vers OAuth2 sécurisé, livraison juin 2026. Concerne toutes les APIs exposées à l'externe (partenaires, apps).</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">API Management</div>
+  <div class="gterm-def">Plateforme qui gouverne, sécurise, monitore et documente toutes les APIs exposées d'une organisation. Fonctions clés : contrôle d'accès, rate limiting, analytics, portail développeurs, versioning.</div>
+  <div class="gterm-inwi">Rôle tenu par APIGEE chez INWI — point de passage obligatoire entre les canaux digitaux, les partenaires et les systèmes core (Salesforce, Codix...).</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">APIGEE</div>
+  <div class="gterm-def">Produit Google Cloud d'API Management (API Gateway + Analytics + Developer Portal). Permet de créer, sécuriser et analyser les APIs. Acquis par Google en 2016, leader du marché.</div>
+  <div class="gterm-inwi">Déployé comme couche d'intégration principale. Toute API externe d'INWI devrait passer par APIGEE. Question à poser à Architecture : y a-t-il des APIs "sauvages" qui contournent APIGEE ?</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">Kafka (Apache Kafka)</div>
+  <div class="gterm-def">Plateforme de streaming d'événements open-source. Fonctionne en mode publish/subscribe : des producteurs publient des messages sur des "topics", des consommateurs s'y abonnent et les traitent à leur rythme. Conçu pour de très hauts volumes (millions de messages/seconde) et la résilience.</div>
+  <div class="gterm-inwi">Dans la couche d'intégration INWI (avec Oracle SOA et APIGEE). Utilisé pour les flux haute volumétrie et temps réel — ex : remontée d'événements réseau, CDRs. Complémentaire à l'ESB synchrone.</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">Architecture événementielle (EDA — Event-Driven Architecture)</div>
+  <div class="gterm-def">Paradigme architectural où les systèmes communiquent via des événements plutôt que des appels directs. Un système publie "SIM activée", les autres systèmes intéressés réagissent indépendamment. Plus découplé, plus résilient, mieux adapté aux pics de charge que les appels synchrones.</div>
+  <div class="gterm-inwi">Kafka en est l'implémentation chez INWI. Complémentaire à l'ESB Oracle SOA qui reste synchrone pour les flux transactionnels critiques (commande → activation).</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">Communication synchrone</div>
+  <div class="gterm-def">L'appelant envoie une requête et attend la réponse avant de continuer. Simple à implémenter, mais crée des dépendances : si le système appelé est lent ou HS, l'appelant se bloque. Utilisé pour les flux transactionnels (REST API, SOAP via ESB).</div>
+  <div class="gterm-inwi">Oracle SOA et APIGEE fonctionnent principalement en mode synchrone — ex : Salesforce envoie un ordre d'activation → attend la confirmation Nokia. Un timeout Nokia = une commande en suspens.</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">Communication asynchrone</div>
+  <div class="gterm-def">L'appelant envoie un message et n'attend pas la réponse immédiate. Le message est stocké dans une file/topic et traité quand le consommateur est disponible. Plus résilient aux pannes, mieux adapté aux hauts volumes.</div>
+  <div class="gterm-inwi">Kafka est le moteur asynchrone d'INWI. Avantage : si Codix est temporairement indisponible, les CDRs restent dans Kafka et sont traités à la reprise — pas de perte de données.</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">SOA (Service-Oriented Architecture)</div>
+  <div class="gterm-def">Style architectural où les fonctionnalités métier sont exposées comme des services réutilisables avec des interfaces standardisées (WSDL/SOAP). Les services communiquent via un ESB central. Apparu dans les années 2000, précurseur des microservices.</div>
+  <div class="gterm-inwi">Oracle SOA est l'ESB qui implémente la SOA chez INWI — il orchestre les échanges entre Salesforce, Codix, Nokia, SAP... Architecture historique robuste mais moins agile que les microservices modernes.</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">ESB (Enterprise Service Bus)</div>
+  <div class="gterm-def">Middleware d'intégration central qui route, transforme et orchestre les messages entre systèmes hétérogènes. Agit comme un "chef d'orchestre" des flux applicatifs. Point fort : découplage des systèmes. Point faible : peut devenir un point de fragilité central (SPOF) si mal dimensionné.</div>
+  <div class="gterm-inwi">Oracle SOA joue ce rôle chez INWI. À challenger avec Architecture : quelle est la charge actuelle de l'ESB ? Y a-t-il des plans de modernisation vers une architecture plus microservices/API ?</div>
+</div>
+
+<div class="gterm" data-cat="integration">
+  <div class="gterm-name">OAuth2</div>
+  <div class="gterm-def">Standard d'autorisation (RFC 6749) pour les APIs. Remplace les clés API statiques par des tokens d'accès temporaires signés (JWT). Plus sécurisé : les tokens expirent, peuvent être révoqués, sont limités en scope. Devenu le standard universel des APIs modernes.</div>
+  <div class="gterm-inwi">Migration OAuth2 en cours (projet API Digital, 68%). Remplace les clés API statiques actuelles — si une clé est compromise aujourd'hui, elle donne un accès illimité. OAuth2 limite l'exposition. Livraison juin 2026.</div>
+</div>
+
+<!-- ═══════════ BSS ═══════════ -->
+<div class="gterm" data-cat="bss">
+  <div class="gterm-name">BSS (Business Support Systems)</div>
+  <div class="gterm-def">Ensemble des systèmes informatiques qui supportent les processus business d'un opérateur télécom orientés client : gestion des offres, commandes, facturation, paiement, CRM. Le BSS "parle argent et client".</div>
+  <div class="gterm-inwi">BSS INWI = Salesforce (CRM) + Codix IMX (billing, remplace BSCS via PHENIX) + PAYX/HPS (paiement) + CSG International (interconnexion) + BASSET (roaming) + Comviva Mobiquity (inwi Money).</div>
+</div>
+
+<div class="gterm" data-cat="bss">
+  <div class="gterm-name">CRM (Customer Relationship Management)</div>
+  <div class="gterm-def">Système de gestion de la relation client. Centralise toutes les interactions avec le client : historique d'achats, contrats, réclamations, opportunités commerciales. Vue 360° du client.</div>
+  <div class="gterm-inwi">Salesforce (Sales Cloud + Service Cloud + Comms Cloud) est le CRM INWI. Le projet RAF B2B vise à étendre Salesforce aux grands comptes B2B — bloqué faute de sponsor Direction B2B.</div>
+</div>
+
+<div class="gterm" data-cat="bss">
+  <div class="gterm-name">Billing (Facturation)</div>
+  <div class="gterm-def">Processus de collecte des usages (CDRs), valorisation (rating), composition de la facture et émission. Comprend la gestion des offres tarifaires, des remises, du recouvrement et de la correction (credit management).</div>
+  <div class="gterm-inwi">BSCS (historique, en fin de vie) est remplacé par Codix IMX via le projet PHENIX (35% d'avancement). La coexistence des deux systèmes est la période de risque maximum — CDRs mal migrés = factures erronées.</div>
+</div>
+
+<div class="gterm" data-cat="bss">
+  <div class="gterm-name">OCS (Online Charging System)</div>
+  <div class="gterm-def">Système de charging en temps réel, principalement pour les clients prépayés. Débite le crédit avant ou pendant l'usage (vs billing postpaid qui facture à la fin du mois). Si l'OCS tombe, plus de consommation possible pour les prépayés.</div>
+  <div class="gterm-inwi">Critique chez INWI où la base prépayée est importante. Une panne OCS = impact immédiat sur des millions de clients. SLA de disponibilité à vérifier avec S&E.</div>
+</div>
+
+<div class="gterm" data-cat="bss">
+  <div class="gterm-name">PCRF (Policy and Charging Rules Function)</div>
+  <div class="gterm-def">Équipement réseau (4G) qui définit en temps réel les règles de qualité de service (QoS) et de charging pour chaque session data. Décide si un client peut streamer en HD, s'il a atteint son quota de data, s'il passe en débit réduit. Interface entre le réseau (PGW) et les systèmes de charging (OCS/BSS).</div>
+  <div class="gterm-inwi">Périmètre réseau, mais ses décisions impactent directement la perception client et la facturation. Un PCRF mal configuré = clients qui ne passent pas en 4G malgré un forfait valide.</div>
+</div>
+
+<div class="gterm" data-cat="bss">
+  <div class="gterm-name">Service Fulfillment</div>
+  <div class="gterm-def">Processus de bout en bout de livraison d'un service commandé par un client : de la prise de commande (Order Management) jusqu'à l'activation effective sur le réseau (Provisioning) et la confirmation client. C'est le "de la vente à l'ouverture de service".</div>
+  <div class="gterm-inwi">Flux : Salesforce (commande) → Oracle SOA → Nokia Provisioning → réseau. Un délai ou une erreur dans ce flux = client qui attend son service. KPI : délai moyen d'activation.</div>
+</div>
+
+<div class="gterm" data-cat="bss">
+  <div class="gterm-name">Roaming</div>
+  <div class="gterm-def">Utilisation du réseau d'un opérateur étranger lors d'un déplacement international. L'opérateur visiteur fournit le réseau, l'opérateur d'origine facture le client. Les échanges de données de taxation entre opérateurs se font via des fichiers standardisés (TAP files).</div>
+  <div class="gterm-inwi">BASSET gère les échanges inter-opérateurs côté SI. Le billing Codix doit valoriser les CDRs roaming selon les accords bilatéraux. Le roaming est soumis à régulation (ARCEP Maroc) — les tarifs maximum sont plafonnés.</div>
+</div>
+
+<div class="gterm" data-cat="bss">
+  <div class="gterm-name">QoS (Quality of Service)</div>
+  <div class="gterm-def">Mécanisme de priorisation et de garantie de la qualité des flux réseau. Permet d'assurer qu'un type de trafic (ex : VoLTE) reçoit la bande passante et la latence nécessaires même en période de congestion, au détriment d'autres flux moins prioritaires.</div>
+  <div class="gterm-inwi">Les règles QoS définies dans les offres commerciales (forfaits) sont implémentées dans le PCRF. Enjeu : s'assurer que les offres BSS et les règles QoS réseau sont bien synchronisées — sinon décalage entre ce que le client a acheté et ce qu'il reçoit.</div>
+</div>
+
+<!-- ═══════════ OSS & FIELD ═══════════ -->
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">OSS (Operations Support Systems)</div>
+  <div class="gterm-def">Ensemble des systèmes qui supportent les opérations réseau et techniques d'un opérateur : activation des services, supervision des équipements, gestion des incidents, inventaire des ressources. L'OSS "parle réseau et technique".</div>
+  <div class="gterm-inwi">OSS INWI = ServiceNow (ITSM) + Nokia Provisioning (activation réseau) + Centreon (supervision infra) + Dynatrace (monitoring applicatif/APM) + SPN (portabilité des numéros).</div>
+</div>
+
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">Provisioning</div>
+  <div class="gterm-def">Acte technique d'activation ou de modification d'un service sur le réseau en réponse à une commande BSS. Le provisioning configure les équipements réseau (Core, DSLAM, OLT...) pour qu'un client puisse utiliser son service. C'est le pont entre le BSS et le réseau.</div>
+  <div class="gterm-inwi">Nokia Provisioning reçoit les ordres du SI (via Oracle SOA) et configure le Core Network. Un bug de provisioning = client activé en facturation mais pas sur le réseau — réclamation assurée.</div>
+</div>
+
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">Work Order (WO)</div>
+  <div class="gterm-def">Ordre de travail formalisé déclenchant une action terrain ou système : installation d'équipement, intervention de dépannage, activation de service, reconfiguration réseau. Le WO contient le contexte, les instructions, les ressources affectées et le délai attendu.</div>
+  <div class="gterm-inwi">Dans ServiceNow Field Service Management. Exemple : un client souscrit à la fibre → création automatique d'un WO pour le technicien qui vient poser l'ONT. Le suivi des WOs est un KPI opérationnel clé (taux de fermeture à temps).</div>
+</div>
+
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">WOT (Work Order Tracking / Workflow Orchestration Tool)</div>
+  <div class="gterm-def">Outil ou module de suivi des ordres de travail tout au long de leur cycle de vie : création, assignation, exécution terrain, validation, clôture. Peut inclure de l'orchestration automatique du workflow (dispatch intelligent, escalade automatique).</div>
+  <div class="gterm-inwi">Fonctionnalité cible dans ServiceNow FSM. Aujourd'hui potentiellement géré hors-outil (Excel, email) — source d'angles morts dans le suivi des interventions FTTH et terrain.</div>
+</div>
+
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">Service Assurance</div>
+  <div class="gterm-def">Processus de surveillance et de maintien de la qualité des services en exploitation. Comprend : détection proactive des dégradations, gestion des incidents, analyse des causes racines, respect des SLA. C'est la "vie après la mise en service".</div>
+  <div class="gterm-inwi">Côté DSI : Centreon (supervision infra) + Dynatrace (monitoring applicatif) + ServiceNow (gestion des incidents). La direction S&E est en charge de cette fonction pour le périmètre SI.</div>
+</div>
+
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">Resource Management</div>
+  <div class="gterm-def">Gestion de l'inventaire des ressources réseau et SI : équipements physiques, adresses IP, numéros de téléphone, circuits, capacités. Permet de savoir "qui utilise quoi" et d'éviter les doublons d'allocation ou les erreurs de configuration.</div>
+</div>
+
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">Inventory Management</div>
+  <div class="gterm-def">Sous-ensemble du Resource Management — inventaire physique et logique de tous les équipements du réseau et du SI (OLT, DSLAM, serveurs, SIM, câbles...). Une CMDB incomplète = un inventory management approximatif = des incidents sans visibilité sur l'impact réel.</div>
+</div>
+
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">Field Operations / Field Service Management (FSM)</div>
+  <div class="gterm-def">Gestion des opérations terrain : dispatch des techniciens, suivi des interventions d'installation ou de dépannage, gestion des stocks pièces détachées. Le FSM (module ServiceNow) automatise ces flux et donne de la visibilité en temps réel sur les interventions en cours.</div>
+  <div class="gterm-inwi">Enjeu FTTH : chaque déploiement fibre génère des dizaines de WOs terrain par jour. Sans FSM, le suivi se fait en Excel — délais, erreurs, coûts non maîtrisés.</div>
+</div>
+
+<div class="gterm" data-cat="oss">
+  <div class="gterm-name">NOC (Network Operations Center)</div>
+  <div class="gterm-def">Centre de surveillance du réseau télécom en 24h/24, 7j/7. Le NOC monitore l'état des équipements réseau (antennes, liens, core) et déclenche les actions de remédiation en cas d'incident réseau. Périmètre réseau — distinct du helpdesk SI.</div>
+  <div class="gterm-inwi">Périmètre Direction Réseau, pas DSI. Mais un incident qui touche à la fois le réseau et le SI (ex : panne inwi Money) nécessite une coordination NOC ↔ DSI — à cadrer avec des procédures d'escalade claires.</div>
+</div>
+
+<div class="gterm" data-cat="ops">
+  <div class="gterm-name">SOC (Security Operations Center)</div>
+  <div class="gterm-def">Centre de surveillance de la cybersécurité en continu. Le SOC détecte les menaces (intrusions, malware, comportements suspects), analyse les alertes et coordonne la réponse aux incidents de sécurité. Outillé avec un SIEM (Security Information and Event Management).</div>
+  <div class="gterm-inwi">Axe d'amélioration identifié dans le diagnostic Olivier. La maturité sécurité est un sujet à adresser dans la roadmap DSI — réglementairement exigé par l'ANSSII/DGSSI au Maroc pour les opérateurs télécoms.</div>
+</div>
+
+<!-- ═══════════ RÉSEAU CORE ═══════════ -->
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">Core Network (Cœur de réseau)</div>
+  <div class="gterm-def">Ensemble des équipements centraux du réseau télécom qui gèrent l'authentification des abonnés, la commutation, le routage des appels et des données, et l'interconnexion avec d'autres réseaux (Internet, opérateurs étrangers). Distinct du RAN (accès radio) et du transport.</div>
+  <div class="gterm-inwi">C'est ici que Nokia Provisioning interagit pour activer les services. Un incident Core = potentiellement des millions de clients impactés simultanément.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">HLR (Home Location Register)</div>
+  <div class="gterm-def">Base de données réseau 2G/3G stockant les informations de tous les abonnés : numéro (MSISDN), identifiant SIM (IMSI), services autorisés, localisation courante. Consulté à chaque appel/SMS pour authentifier l'abonné et router la communication.</div>
+  <div class="gterm-inwi">Remplacé par le HSS dans le réseau 4G d'INWI. Le HLR reste utilisé pour les abonnés encore sur 2G/3G et pour le roaming entrant d'opérateurs partenaires.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">HSS (Home Subscriber Server)</div>
+  <div class="gterm-def">Successeur 4G du HLR. Base de données centrale des abonnés pour les réseaux LTE/4G. Gère l'authentification (vérification de la clé SIM), l'autorisation des services et la localisation. Point critique : si le HSS tombe, aucun abonné ne peut s'enregistrer sur le réseau 4G.</div>
+  <div class="gterm-inwi">Équipement réseau (périmètre Direction Réseau). Mais son indisponibilité impacte directement les KPIs SI (disponibilité des services). À surveiller dans les alertes S&E.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">UDM (Unified Data Management)</div>
+  <div class="gterm-def">Équivalent du HSS dans l'architecture 5G Core (3GPP). Centralise la gestion des données d'abonnés, des politiques d'accès et des contextes de session. Architecture microservices, contrairement au HSS monolithique.</div>
+  <div class="gterm-inwi">Sera déployé lors de la migration vers le 5G Core. Implication SI : le BSS/OSS devra interfacer avec l'UDM via les APIs 5G standardisées (NSSF, etc.).</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">IMS (IP Multimedia Subsystem)</div>
+  <div class="gterm-def">Architecture réseau standard (3GPP) qui permet de fournir des services voix et multimédia sur des réseaux IP (4G, fibre). IMS supporte VoLTE, VoWiFi, RCS (messagerie enrichie). Il "traduit" la voix traditionnelle en flux IP.</div>
+  <div class="gterm-inwi">IMS supporte VoLTE chez INWI. Implication billing : les appels VoLTE génèrent des CDRs de type IMS différents des CDRs voix 2G/3G — le billing Codix doit les valoriser correctement.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">VoLTE (Voice over LTE)</div>
+  <div class="gterm-def">Technologie permettant les appels voix sur le réseau 4G via l'IMS. Avantages : qualité audio HD, établissement de l'appel plus rapide, conservation de la connexion data pendant l'appel. Sans VoLTE, le téléphone retombe sur le 2G/3G pour les appels.</div>
+  <div class="gterm-inwi">Déployé chez les opérateurs Maroc. Implication SI : CDRs VoLTE spécifiques à valoriser dans Codix. La migration PHENIX doit prendre en compte ces formats pour ne pas casser la facturation VoLTE.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">LTE / 4G</div>
+  <div class="gterm-def">Long Term Evolution — technologie de réseau mobile actuelle. Architecture tout-IP (voix et data sur le même réseau IP). Débits théoriques jusqu'à 300 Mbps en téléchargement. Le cœur de réseau 4G s'appelle EPC (Evolved Packet Core).</div>
+  <div class="gterm-inwi">Technologie dominante dans le réseau INWI aujourd'hui. Le SI billing doit traiter des CDRs de sessions data (volumétrie en Go, durée, APN, type de service) — différent des CDRs voix 2G.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">EPC (Evolved Packet Core)</div>
+  <div class="gterm-def">Cœur de réseau 4G/LTE. Comprend : MME (gestion de la mobilité), SGW (passerelle locale), PGW (passerelle vers Internet), HSS (base abonnés), PCRF (politiques QoS). Traite l'authentification, la mobilité et le routage des données.</div>
+  <div class="gterm-inwi">Remplacé progressivement par le 5G Core lors de la migration 5G. L'EPC génère les CDRs data qui alimentent Nokia Médiation → Codix pour la facturation.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">PGW / P-GW (Packet Data Network Gateway)</div>
+  <div class="gterm-def">Équipement EPC qui est la passerelle entre le réseau mobile et les réseaux externes (Internet, réseau entreprise). Applique les politiques QoS du PCRF, alloue les adresses IP aux terminaux et génère les CDRs de sessions data. Remplacé par l'UPF en 5G.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">SGW / S-GW (Serving Gateway)</div>
+  <div class="gterm-def">Équipement EPC qui gère la mobilité des sessions data lors des déplacements (handovers entre antennes). Intermédiaire entre l'eNodeB (antenne 4G) et le PGW. Maintient la continuité de la session data quand le client change de cellule.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">AMF (Access and Mobility Management Function)</div>
+  <div class="gterm-def">Fonction 5G Core remplaçant le MME (4G). Gère l'enregistrement des terminaux 5G, l'authentification (avec l'AUSF et l'UDM) et la mobilité. Architecture microservices — peut être déployée en conteneurs.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">UPF (User Plane Function)</div>
+  <div class="gterm-def">Fonction 5G Core remplaçant le PGW pour le traitement du plan utilisateur (trafic data). Route les données entre le terminal et Internet. Peut être déployé à l'edge (MEC — Multi-access Edge Computing) pour réduire la latence pour les applications critiques.</div>
+  <div class="gterm-inwi">L'UPF distribué (edge) permettra des cas d'usage industriels 5G avec latence &lt;5ms. Horizon 2-4 ans pour INWI selon la stratégie 5G.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-core">
+  <div class="gterm-name">5G Core (NGC — Next Generation Core)</div>
+  <div class="gterm-def">Architecture cœur de réseau 5G, entièrement cloud-native et microservices. Remplace l'EPC 4G. Introduit une séparation complète plan contrôle / plan utilisateur (Control and User Plane Separation — CUPS). Permet le network slicing : découper le réseau en tranches virtuelles dédiées par usage.</div>
+  <div class="gterm-inwi">Implication SI profonde : nouveaux formats de CDRs, charging en quasi temps réel, nouvelles interfaces vers le BSS/OSS. Le choix de Codix IMX (PHENIX) intègre en partie cette évolutivité 5G.</div>
+</div>
+
+<!-- ═══════════ RÉSEAU ACCÈS & TRANSPORT ═══════════ -->
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">RAN (Radio Access Network)</div>
+  <div class="gterm-def">Partie radio du réseau télécom — antennes (BTS en 2G, NodeB en 3G, eNodeB en 4G, gNodeB en 5G) et leurs contrôleurs. Ce que vous voyez physiquement sur les pylônes et toits. Relie les terminaux mobiles au cœur de réseau via des ondes radio.</div>
+  <div class="gterm-inwi">Périmètre Direction Réseau INWI, pas DSI. Un incident RAN = zone géographique coupée. Ne pas confondre avec un incident SI applicatif — le diagnostic "réseau ou SI ?" est la première question lors de tout signalement client.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">Couche Accès</div>
+  <div class="gterm-def">Première couche du réseau télécom — les équipements qui permettent aux clients de se connecter : antennes radio (mobile), DSLAM (ADSL), OLT (fibre). C'est le "dernier kilomètre" entre le réseau de l'opérateur et l'équipement du client.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">Couche Transport (Backhaul)</div>
+  <div class="gterm-def">Réseau de transmission reliant les équipements d'accès (antennes, DSLAM, OLT) aux équipements du cœur de réseau. Utilise des fibres optiques, des liens microondes ou des faisceaux hertziens. Un incident transport = toute une zone d'antennes coupée simultanément.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">Backbone IP/MPLS</div>
+  <div class="gterm-def">Réseau de transport haute capacité interconnectant les nœuds majeurs de l'infrastructure (PoP — Points of Presence). MPLS (MultiProtocol Label Switching) permet de créer des circuits virtuels avec garanties de QoS sur une infrastructure IP partagée. La colonne vertébrale du réseau.</div>
+  <div class="gterm-inwi">Le backbone d'INWI interconnecte les datacenters, les nœuds de core réseau et les points d'interconnexion Internet (IX). Sa résilience est critique — un point de défaillance peut impacter plusieurs services simultanément.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">FTTH (Fiber To The Home)</div>
+  <div class="gterm-def">Fibre optique déployée jusqu'au domicile ou au bureau du client. Débits symétriques (même upload que download), latence très faible, pas de dégradation avec la distance. Architecture : OLT (côté réseau) → splitter optique passif → ONT (côté client).</div>
+  <div class="gterm-inwi">Offre inwi box FTTH. La chaîne SI de déploiement FTTH (commande → Work Order terrain → provisioning BNG → activation service triple play) est un flux complet qui traverse BSS et OSS.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">GPON (Gigabit Passive Optical Network)</div>
+  <div class="gterm-def">Standard de réseau fibre optique passif permettant de partager une seule fibre entre 32 ou 64 clients via des coupleurs optiques passifs (sans alimentation électrique). Débit : 2,5 Gbps descendant / 1,25 Gbps montant partagés entre les clients du même PON.</div>
+  <div class="gterm-inwi">Standard dominant pour le déploiement FTTH d'INWI. "Passif" = pas d'électronique en dehors de l'OLT et de l'ONT — infrastructure robuste et peu coûteuse à maintenir.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">XGS-PON</div>
+  <div class="gterm-def">Évolution du GPON offrant 10 Gbps symétrique (XGS = 10 Gigabit Symmetric). Compatible avec l'infrastructure GPON existante (mêmes fibres et splitters). Nécessite le remplacement des OLT et des ONT. Répond aux besoins de débit croissants (4K/8K, télétravail intensif).</div>
+  <div class="gterm-inwi">Dans les plans de déploiement next-gen INWI. Migration progressive des cartes OLT sans toucher à l'infrastructure passive — investissement maîtrisé.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">OLT (Optical Line Terminal)</div>
+  <div class="gterm-def">Équipement actif côté réseau d'une liaison PON (fibre). Concentre les connexions optiques de nombreux clients (32 à 128 ONT par port PON). Gère la synchronisation temporelle des ONT et communique avec le BNG pour l'authentification et le routage.</div>
+  <div class="gterm-inwi">Un OLT en panne = potentiellement plusieurs centaines de clients FTTH coupés simultanément. À inventorier dans la CMDB et à équiper d'alertes Centreon avec SLA d'intervention défini.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">ONT (Optical Network Terminal)</div>
+  <div class="gterm-def">La "box fibre" chez le client. Termine la liaison optique GPON et fournit des ports Ethernet (et parfois WiFi, téléphonie). Équipement actif — nécessite une alimentation électrique chez le client. Sa défaillance = perte totale de connectivité pour ce client.</div>
+  <div class="gterm-inwi">Côté SI INWI : son activation est gérée via un Work Order terrain (FSM) et un provisioning BNG. L'ONT est un CI à maintenir dans l'inventaire avec son numéro de série et son association client.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">ONU (Optical Network Unit)</div>
+  <div class="gterm-def">Variante de l'ONT utilisée dans les déploiements FTTB (Fiber To The Building) ou FTTC (Fiber To the Cabinet). Mutualisé entre plusieurs appartements d'un immeuble ou logements d'un quartier. Moins courant que l'ONT résidentiel individuel.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">DSLAM (Digital Subscriber Line Access Multiplexer)</div>
+  <div class="gterm-def">Équipement dans les centraux téléphoniques qui concentre les connexions ADSL/VDSL de nombreux clients sur une paire de cuivre (ligne téléphonique). Relie les clients au réseau IP via le BRAS/BNG.</div>
+  <div class="gterm-inwi">Parc en déclin face à la fibre. À inventorier dans le système de Resource Management — les remplacements de cartes DSLAM génèrent des Work Orders et des impacts clients potentiels si mal planifiés.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">BNG (Broadband Network Gateway)</div>
+  <div class="gterm-def">Routeur de bordure qui agrège le trafic broadband (FTTH, ADSL) des clients vers Internet. Gère les sessions PPPoE ou IPoE des clients, applique les politiques de QoS et interroge le serveur AAA/Radius pour l'authentification et la gestion des sessions.</div>
+  <div class="gterm-inwi">Point de contrôle critique pour l'accès fixe INWI. Si le BNG tombe → tous les clients fixe de ce nœud sont coupés. À monitorer en priorité dans Centreon.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">BRAS (Broadband Remote Access Server)</div>
+  <div class="gterm-def">Ancienne terminologie pour le BNG. Fonctionnellement identique — concentre les accès broadband et gère les sessions PPPoE. Souvent utilisé de façon interchangeable avec BNG dans les conversations opérateurs.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">AAA (Authentication, Authorization, Accounting)</div>
+  <div class="gterm-def">Triptyque de sécurité réseau. Authentication : vérifier l'identité (login/mot de passe ou certificat). Authorization : vérifier les droits d'accès (quel service, quel débit). Accounting : enregistrer la consommation (durée, volume) pour la facturation et l'audit. Implémenté via le protocole Radius ou Diameter.</div>
+  <div class="gterm-inwi">Quand un client inwi box se connecte, le BNG interroge le serveur AAA (Radius/Diameter) pour valider ses credentials et récupérer son profil de service. Une panne AAA = plus aucune connexion fixe possible.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">Radius</div>
+  <div class="gterm-def">Protocole réseau (RFC 2865) implémentant les fonctions AAA. Le client réseau (BNG, NAS) envoie les credentials au serveur Radius qui répond Accept/Reject et fournit les attributs de service. Standard historique, encore largement utilisé pour l'accès fixe broadband.</div>
+  <div class="gterm-inwi">Serveur Radius INWI : point critique pour l'accès fixe. Sa disponibilité doit être dans les KPIs S&E et couvert par le PCA. Diameter (plus moderne) est utilisé côté mobile (4G).</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">VLAN (Virtual Local Area Network)</div>
+  <div class="gterm-def">Réseau local virtuel permettant de segmenter logiquement un réseau physique en plusieurs réseaux isolés. Sur un même switch ou lien physique, différents VLANs transportent des flux séparés (ex : VLAN data, VLAN voix, VLAN TV, VLAN management) sans interférence.</div>
+  <div class="gterm-inwi">Utilisé chez INWI pour séparer les flux triple play sur les liaisons GPON (VLAN Internet, VLAN IPTV, VLAN VoIP) et pour isoler les réseaux de management des équipements réseau des réseaux clients.</div>
+</div>
+
+<div class="gterm" data-cat="reseau-acces">
+  <div class="gterm-name">ADSL (Asymmetric Digital Subscriber Line)</div>
+  <div class="gterm-def">Technologie d'accès Internet sur paire de cuivre téléphonique. "Asymétrique" car le débit descendant (download) est plus important que le montant (upload) — adapté à la consommation web. Limité en débit (&lt;20 Mbps) et dégradé avec la distance au DSLAM. En déclin face à la fibre.</div>
+  <div class="gterm-inwi">Parc existant chez INWI en cours de migration progressive vers FTTH. Les clients ADSL restants sont souvent dans des zones où la fibre n'est pas encore déployée — gestion du "parc résiduel" à planifier.</div>
+</div>
+
+<!-- ═══════════ ITSM & CMDB ═══════════ -->
+<div class="gterm" data-cat="itsm">
+  <div class="gterm-name">CMDB (Configuration Management Database)</div>
+  <div class="gterm-def">Base de données centralisée référençant tous les éléments de configuration (CI) du SI et du réseau, leurs attributs et leurs relations. La CMDB est le "plan cadastral" du SI. Quand un incident survient, elle permet de comprendre immédiatement l'impact en chaîne. Sans CMDB à jour : diagnostic à l'aveugle.</div>
+  <div class="gterm-inwi">Dans ServiceNow chez INWI. Partiellement alimentée — enrichissement à prioriser. Un CMDB incomplet = lors d'un incident, impossibilité de répondre à la question "quels clients/services sont impactés ?"</div>
+</div>
+
+<div class="gterm" data-cat="itsm">
+  <div class="gterm-name">CI (Configuration Item)</div>
+  <div class="gterm-def">Tout composant géré dans la CMDB : un serveur, une application, un service métier, un lien réseau, un contrat de licence, un datacenter. Chaque CI a des attributs (nom, version, propriétaire, statut) et des relations avec d'autres CIs (dépendances, composants).</div>
+  <div class="gterm-inwi">Exemples de CIs INWI : Salesforce (application), OLT-CASA-01 (équipement réseau), BSCS (application en cours de décommissionnement), Oracle SOA (middleware). Bien définir les CIs prioritaires est la première étape de la CMDB.</div>
+</div>
+
+<div class="gterm" data-cat="itsm">
+  <div class="gterm-name">Service Mapping</div>
+  <div class="gterm-def">Processus (et fonctionnalité ServiceNow) qui cartographie automatiquement les relations entre les CIs pour construire une "carte de service" : quels serveurs, applications et liens réseau supportent un service donné. Permet l'analyse d'impact automatique lors d'un incident.</div>
+  <div class="gterm-inwi">Quand Salesforce ralentit, le Service Mapping permet de répondre en 30 secondes : "c'est le serveur WEBAPP-02 qui est à 95% de CPU, qui supporte aussi le portail client". Sans Service Mapping : investigation manuelle de 30 minutes.</div>
+</div>
+
+<div class="gterm" data-cat="itsm">
+  <div class="gterm-name">Discovery (ServiceNow)</div>
+  <div class="gterm-def">Module ServiceNow qui scanne automatiquement l'infrastructure (serveurs, applications, équipements réseau) pour alimenter et maintenir la CMDB à jour. Réduit la maintenance manuelle, détecte les nouveaux équipements et les changements non documentés.</div>
+  <div class="gterm-inwi">Activer Discovery est une priorité pour fiabiliser la CMDB INWI. Sans Discovery, la CMDB dépend de saisies manuelles — toujours en retard sur la réalité.</div>
+</div>
+
+<div class="gterm" data-cat="itsm">
+  <div class="gterm-name">CSDM (Common Service Data Model)</div>
+  <div class="gterm-def">Framework ServiceNow standardisant comment organiser et lier les CIs, services techniques et services métier dans la CMDB. Adopter le CSDM, c'est construire la CMDB selon les best practices mondiales — interopérable avec les mises à jour ServiceNow et les benchmarks sectoriels.</div>
+  <div class="gterm-inwi">À valider avec l'équipe ServiceNow INWI : l'implémentation actuelle suit-elle le CSDM ? Un écart au CSDM complique les upgrades futurs de ServiceNow.</div>
+</div>
+
+<div class="gterm" data-cat="itsm">
+  <div class="gterm-name">ServiceNow CMDB</div>
+  <div class="gterm-def">Implémentation de la CMDB dans la plateforme ServiceNow. Intégrée nativement avec les modules ITSM (Incidents, Changements), Service Mapping et Discovery. Permet l'analyse d'impact automatique lors d'un incident et la traçabilité des changements sur les CIs.</div>
+  <div class="gterm-inwi">Partiellement déployée chez INWI. Le projet ServiceNow (bloqué) devait étendre la couverture — notamment le module Changements lié à la CMDB pour tracer l'impact de chaque MEP sur les CIs.</div>
+</div>
+
+<!-- ═══════════ CONTINUITÉ & RÉSILIENCE ═══════════ -->
+<div class="gterm" data-cat="continuite">
+  <div class="gterm-name">PCA (Plan de Continuité d'Activité)</div>
+  <div class="gterm-def">Ensemble des procédures et dispositions permettant à une organisation de maintenir ses activités critiques (à niveau dégradé ou normal) en cas de sinistre majeur : incendie, inondation, cyberattaque, panne datacenter. Le PCA doit être documenté, testé et connu des équipes.</div>
+  <div class="gterm-inwi">Non testé récemment chez INWI. Responsabilité non tranchée entre OPS et INFRA. En cas de sinistre majeur, ce flou organisationnel coûte des heures de récupération supplémentaires. Arbitrage à traiter avant fin juin 2026.</div>
+</div>
+
+<div class="gterm" data-cat="continuite">
+  <div class="gterm-name">PRA (Plan de Reprise d'Activité)</div>
+  <div class="gterm-def">Procédures de retour à la normale après activation du PCA. Définit comment reprendre les activités à leur niveau normal après que la situation de crise est résolue. Complémentaire au PCA — le PCA maintient le service minimum, le PRA le restaure pleinement.</div>
+  <div class="gterm-inwi">Même situation que le PCA chez INWI — à cadrer ensemble. Un PRA sans test = un PRA théorique qui peut échouer au moment critique.</div>
+</div>
+
+<div class="gterm" data-cat="continuite">
+  <div class="gterm-name">RTO (Recovery Time Objective)</div>
+  <div class="gterm-def">Durée maximale acceptable d'indisponibilité d'un service après un sinistre, avant que l'impact métier devienne inacceptable. Ex : RTO = 4h pour Salesforce signifie qu'on doit restaurer Salesforce en moins de 4h après un incident majeur. Plus le RTO est court, plus l'infrastructure de reprise est coûteuse.</div>
+  <div class="gterm-inwi">À définir par service critique chez INWI (BSCS/Codix, Salesforce, OCS, inwi Money...) et à valider avec les Directions Métier. Le RTO guide les investissements infrastructure de reprise.</div>
+</div>
+
+<div class="gterm" data-cat="continuite">
+  <div class="gterm-name">RPO (Recovery Point Objective)</div>
+  <div class="gterm-def">Quantité maximale de données pouvant être perdues en cas de sinistre, exprimée en temps. Ex : RPO = 1h signifie que les sauvegardes doivent être au moins horaires, et qu'on accepte de perdre au maximum 1h de transactions. Lié directement à la fréquence des sauvegardes et à la stratégie de réplication.</div>
+  <div class="gterm-inwi">Un RPO = 0 (zéro perte de données) pour la facturation et les transactions financières est l'objectif — impossible en pratique à coût raisonnable. Compromis à trouver avec Finance et Métier.</div>
+</div>
+
+<div class="gterm" data-cat="continuite">
+  <div class="gterm-name">Disaster Recovery (DR)</div>
+  <div class="gterm-def">Ensemble des processus, outils et infrastructures permettant de reprendre l'activité IT après un sinistre majeur. Comprend le site de secours (datacenter DR), la réplication des données, les procédures de bascule et les tests réguliers. Étroitement lié au PRA.</div>
+  <div class="gterm-inwi">INWI dispose-t-il d'un site DR actif ? Quelle est la distance géographique entre le site principal et le DR (risque de sinistre commun si trop proches) ? Questions à poser à Infrastructure.</div>
+</div>
+
+<div class="gterm" data-cat="continuite">
+  <div class="gterm-name">Haute Disponibilité (HA — High Availability)</div>
+  <div class="gterm-def">Architecture technique garantissant qu'un service reste disponible malgré la défaillance d'un composant. Basée sur la redondance : 2 serveurs en actif/passif, 2 liens réseau, 2 alimentations électriques... La HA minimise les coupures non planifiées. Objectif typique : 99,9% (8h45 d'indisponibilité/an) à 99,999% (5 minutes/an).</div>
+  <div class="gterm-inwi">Les systèmes critiques INWI (OCS, HSS, Codix, Salesforce) doivent avoir un niveau de HA documenté et testé. Le taux de disponibilité mesuré par S&E doit être comparé aux objectifs HA contractualisés.</div>
+</div>
+
+<!-- ═══════════ OPÉRATIONS & SRE ═══════════ -->
+<div class="gterm" data-cat="ops">
+  <div class="gterm-name">RCA (Root Cause Analysis)</div>
+  <div class="gterm-def">Analyse formelle post-incident visant à identifier la cause profonde (root cause) — pas juste le symptôme traité. Utilise des méthodes structurées (5 Pourquoi, arbre des causes, fishbone). Produit un document qui documente l'incident, l'impact, la timeline, la cause racine et les actions correctives.</div>
+  <div class="gterm-inwi">À systématiser après chaque incident P1. Les 14 alertes répétitives identifiées en production suggèrent que les RCAs ne sont pas faites ou que leurs actions correctives ne sont pas suivies d'effets.</div>
+</div>
+
+<div class="gterm" data-cat="ops">
+  <div class="gterm-name">Observability (Observabilité)</div>
+  <div class="gterm-def">Capacité à comprendre l'état interne d'un système à partir de ses sorties externes. Repose sur 3 piliers : Logs (traces d'événements), Métriques (indicateurs numériques dans le temps), Traces distribuées (suivi d'une requête à travers plusieurs services). Une bonne observability permet de diagnostiquer rapidement et de détecter proactivement.</div>
+  <div class="gterm-inwi">Dynatrace couvre les métriques et traces applicatives. La partie logs centralisés (ELK, Splunk?) est à vérifier — sans logs centralisés, l'analyse post-incident est fragmentée entre plusieurs systèmes.</div>
+</div>
+
+<div class="gterm" data-cat="ops">
+  <div class="gterm-name">SRE (Site Reliability Engineering)</div>
+  <div class="gterm-def">Discipline née chez Google qui applique les principes d'ingénierie logicielle aux opérations IT. Objectifs : automatiser les tâches répétitives (toil), définir des SLOs mesurables, gérer des "error budgets" (tolérance aux erreurs qui pilote la cadence des déploiements). Les SRE écrivent du code pour éviter de faire des tâches manuelles.</div>
+  <div class="gterm-inwi">Maturité avancée (N3-N4). À introduire progressivement dans la roadmap DSI — commencer par définir des SLOs par service et mesurer l'error budget. Horizon 2-3 ans pour INWI avec la maturité actuelle à 60.9%.</div>
+</div>
+
+<div class="gterm" data-cat="ops">
+  <div class="gterm-name">Chaos Engineering</div>
+  <div class="gterm-def">Pratique consistant à introduire volontairement des pannes ou des dégradations dans un système en production contrôlée pour tester sa résilience et découvrir les points de faiblesse avant qu'un vrai incident ne les révèle. Popularisé par Netflix (Chaos Monkey). Prérequis : HA solide + observability complète + culture d'équipe mature.</div>
+  <div class="gterm-inwi">Horizon 3-5 ans pour INWI. Prérequis à établir d'abord : PCA/PRA testé, CMDB complète, Dynatrace pleinement exploité, SLOs définis.</div>
+</div>
+
+<!-- ═══════════ STANDARDS ═══════════ -->
+<div class="gterm" data-cat="standards">
+  <div class="gterm-name">TM Forum</div>
+  <div class="gterm-def">Association sectorielle internationale regroupant 850+ opérateurs et fournisseurs télécom. Publie des frameworks de référence : eTOM (Business Process Framework — cartographie des processus), SID (Information Framework — modèle de données), TAM (Application Framework — cartographie applicative), Open APIs (APIs standardisées inter-opérateurs). Standard de facto de l'industrie télécom.</div>
+  <div class="gterm-inwi">Le framework eTOM structure les processus BSS/OSS théoriques — votre direction Architecture et P&G en font probablement référence pour positionner INWI sur les bonnes pratiques sectorielles. À mentionner en réunion pour montrer que vous connaissez le référentiel sectoriel.</div>
+</div>
+
+  </div><!-- fin glossList -->
+</div><!-- fin m7 -->
+
 </main>
 
 <script>
@@ -797,6 +1321,9 @@ function show(id) {
   document.querySelectorAll('.mod-item').forEach(a => a.classList.remove('active'));
   event.currentTarget.classList.add('active');
   document.getElementById('main').scrollTop = 0;
+  // Fermer sidebar mobile
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
 }
 
 function toggle(header) {
@@ -804,14 +1331,39 @@ function toggle(header) {
   fiche.classList.toggle('open');
 }
 
-// Open first fiche of each module by default (already done in HTML)
-// Track read fiches
-const read = JSON.parse(localStorage.getItem('fiches_read') || '{}');
-document.querySelectorAll('.fiche-header').forEach(h => {
-  h.addEventListener('click', () => {
-    const id = h.closest('.fiche').id || h.closest('.module').id + '_' + [...h.closest('.module').querySelectorAll('.fiche')].indexOf(h.closest('.fiche'));
-    read[id] = true;
-    localStorage.setItem('fiches_read', JSON.stringify(read));
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+// GLOSSAIRE — recherche + filtre catégorie
+const glossTerms = document.querySelectorAll('.gterm');
+const totalEl = document.getElementById('glossTotal');
+if (totalEl) totalEl.textContent = '(' + glossTerms.length + ')';
+
+function filterGloss() {
+  const q = (document.getElementById('glossSearch').value || '').toLowerCase();
+  const cat = (document.querySelector('.gcat.active') || {dataset:{cat:'all'}}).dataset.cat;
+  let visible = 0;
+  glossTerms.forEach(t => {
+    const matchQ = !q || t.textContent.toLowerCase().includes(q);
+    const matchC = cat === 'all' || t.dataset.cat === cat;
+    const show = matchQ && matchC;
+    t.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const countEl = document.getElementById('glossCount');
+  if (countEl) countEl.textContent = visible + ' terme' + (visible > 1 ? 's' : '') + ' affiché' + (visible > 1 ? 's' : '');
+}
+
+const glossInput = document.getElementById('glossSearch');
+if (glossInput) glossInput.addEventListener('input', filterGloss);
+
+document.querySelectorAll('.gcat').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.gcat').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    filterGloss();
   });
 });
 </script>
